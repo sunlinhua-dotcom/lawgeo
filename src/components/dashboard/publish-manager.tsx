@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { ContentDraft, PublishTarget } from "@/lib/db/schema";
 import { PLATFORM_SPECS, type PublishPlatform } from "@/lib/publish-specs";
+import { WechatsyncPublishButton } from "./wechatsync-button";
 
 const ALL_PLATFORMS = Object.values(PLATFORM_SPECS);
 
@@ -82,8 +83,17 @@ export function PublishManager({
     );
   }
 
+  const activeDraft = drafts.find((d) => d.id === selectedDraft);
+
   return (
     <div className="space-y-6">
+      {activeDraft && (
+        <WechatsyncPublishButton
+          title={activeDraft.title}
+          content={activeDraft.body}
+          desc={activeDraft.body.replace(/[#*`>]/g, "").slice(0, 120)}
+        />
+      )}
       <OverseasAutoPanel drafts={drafts} selectedDraft={selectedDraft} setSelectedDraft={setSelectedDraft} />
       <Card>
         <CardHeader>
