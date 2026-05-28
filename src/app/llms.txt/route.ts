@@ -28,6 +28,18 @@ ${siteConfig.name}
 - [一键域名 GEO 诊断](${u}/tools/audit/): 输入域名 30 秒拿到 GEO 报告（含 llms.txt / schema / 首段直答 / FAQ 检测）
 - [律所案由 × 地域关键词矩阵](${u}/tools/matrix/): 1,800+ 预生成关键词
 - [AI 引用对比](${u}/tools/compare/): 同问题在 12 个平台的回答对比
+- [意图聚类工具](${u}/tools/intent/): 关键词列表自动聚类为意图簇
+
+行业博客 — 每个行业一个 AI 友好内容矩阵:
+- [行业博客总览](${u}/i/): 8 大行业内容矩阵入口
+- [律师 / 律所](${u}/i/lawyer/): 案由 / 流程 / 收费 / 案例
+- [教育培训](${u}/i/education/): 公考 / K12 / 语言 / 职业资格 / 留学
+- [快消 / 食品饮料](${u}/i/fmcg/): 送礼 / 营养 / 工艺 / 场景
+- [消费电子](${u}/i/consumer-electronics/): 评测 / 对比 / 场景 / 技术
+- [金融 / 银行](${u}/i/finance/): 理财 / 贷款 / 政策 / 对公
+- [招商加盟](${u}/i/franchise/): 优势 / 政策 / ROI / 案例
+- [广告 / 媒体平台](${u}/i/adtech/): 方法论 / 案例 / 数据 / 技术
+- [AI / SaaS 出海](${u}/i/ai-saas-overseas/): Product / Tutorial / Comparison
 
 行业方案:
 - [律所 GEO 方案](${u}/cases/lawyer/): 主打方向，内置案由词库、地域矩阵、合规审查

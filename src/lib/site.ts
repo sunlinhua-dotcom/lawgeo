@@ -30,11 +30,10 @@ export const siteConfig = {
   nav: [
     { href: "/insight", label: "GEO 洞察" },
     { href: "/generate", label: "AI 生成" },
-    { href: "/publish", label: "多平台发布" },
-    { href: "/monitor", label: "AI 引用监测" },
+    { href: "/i", label: "行业博客" },
+    { href: "/monitor", label: "AI 监测" },
     { href: "/cases", label: "行业方案" },
     { href: "/pricing", label: "定价" },
-    { href: "/blog", label: "知识库" },
     { href: "/tools/audit", label: "免费诊断", highlight: true },
   ],
   footerNav: [

@@ -291,6 +291,112 @@ export const conversionEvents = sqliteTable(
   ],
 );
 
+// ── 作者库（行业博客文章的署名人） ─────────────────────────────────
+export const authors = sqliteTable(
+  "authors",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    title: text("title"), // 头衔：高级律师 / 主笔专家 / 教研主任
+    bio: text("bio"), // 简介
+    expertise: text("expertise"), // JSON array：擅长领域
+    avatarUrl: text("avatar_url"),
+    industry: text("industry"), // 关联行业
+    socialLinks: text("social_links"), // JSON：{weibo, zhihu, wechat...}
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [
+    index("authors_user_idx").on(t.userId),
+    uniqueIndex("authors_user_slug").on(t.userId, t.slug),
+  ],
+);
+
+// ── 行业博客文章（pillar/cluster 结构、AI 友好） ───────────────────
+export const blogPosts = sqliteTable(
+  "blog_posts",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    authorId: text("author_id").references(() => authors.id, { onDelete: "set null" }),
+    industry: text("industry").notNull(), // lawyer/education/fmcg/...
+    slug: text("slug").notNull(),
+    title: text("title").notNull(),
+    excerpt: text("excerpt"),
+    body: text("body").notNull(), // markdown
+    schemaJson: text("schema_json"), // 完整 JSON-LD: Article + FAQ + Person + Breadcrumb
+    /** 文章类型：pillar 是支柱页（覆盖大主题），cluster 是子页（覆盖长尾） */
+    postType: text("post_type", { enum: ["pillar", "cluster", "case-study", "howto", "faq"] })
+      .notNull()
+      .default("cluster"),
+    /** 所属 pillar slug（cluster 链回 pillar） */
+    pillarSlug: text("pillar_slug"),
+    keywords: text("keywords"), // JSON array
+    tags: text("tags"), // JSON array
+    wordCount: integer("word_count"),
+    readMinutes: integer("read_minutes"),
+    status: text("status", { enum: ["draft", "scheduled", "published", "archived"] })
+      .notNull()
+      .default("draft"),
+    scheduledAt: integer("scheduled_at", { mode: "timestamp" }),
+    publishedAt: integer("published_at", { mode: "timestamp" }),
+    viewCount: integer("view_count").notNull().default(0),
+    citationCount: integer("citation_count").notNull().default(0), // AI 引用次数
+    model: text("model"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [
+    index("posts_user_idx").on(t.userId),
+    index("posts_industry_idx").on(t.industry),
+    index("posts_status_idx").on(t.status),
+    index("posts_pillar_idx").on(t.pillarSlug),
+    uniqueIndex("posts_industry_slug").on(t.industry, t.slug),
+  ],
+);
+
+// ── 批量生成任务（异步队列） ───────────────────────────────────────
+export const bulkJobs = sqliteTable(
+  "bulk_jobs",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    industry: text("industry").notNull(),
+    authorId: text("author_id"),
+    keywords: text("keywords").notNull(), // JSON array
+    /** 每个关键词生成几篇 */
+    perKeyword: integer("per_keyword").notNull().default(1),
+    /** 文章总数（= keywords.length × perKeyword） */
+    totalCount: integer("total_count").notNull(),
+    completedCount: integer("completed_count").notNull().default(0),
+    failedCount: integer("failed_count").notNull().default(0),
+    autoPublish: integer("auto_publish", { mode: "boolean" }).notNull().default(true),
+    status: text("status", { enum: ["queued", "running", "done", "failed", "canceled"] })
+      .notNull()
+      .default("queued"),
+    error: text("error"),
+    startedAt: integer("started_at", { mode: "timestamp" }),
+    finishedAt: integer("finished_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [
+    index("bulk_user_idx").on(t.userId),
+    index("bulk_status_idx").on(t.status),
+  ],
+);
+
 // ── 第三方平台凭证（用于自动发布） ─────────────────────────────────
 export const publishCredentials = sqliteTable(
   "publish_credentials",
@@ -439,3 +545,6 @@ export type KnowledgeChunk = typeof knowledgeChunks.$inferSelect;
 export type ConversionLink = typeof conversionLinks.$inferSelect;
 export type ConversionEvent = typeof conversionEvents.$inferSelect;
 export type PublishCredential = typeof publishCredentials.$inferSelect;
+export type Author = typeof authors.$inferSelect;
+export type BlogPost = typeof blogPosts.$inferSelect;
+export type BulkJob = typeof bulkJobs.$inferSelect;

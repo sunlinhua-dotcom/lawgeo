@@ -1,7 +1,10 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site";
+import { INDUSTRIES } from "@/data/industries";
+import { db, schema } from "@/lib/db";
+import { eq } from "drizzle-orm";
 
-const ROUTES = [
+const STATIC_ROUTES = [
   { path: "/", priority: 1.0 },
   { path: "/insight", priority: 0.9 },
   { path: "/generate", priority: 0.9 },
@@ -37,14 +40,47 @@ const ROUTES = [
   { path: "/tools/matrix", priority: 0.8 },
   { path: "/tools/compare", priority: 0.8 },
   { path: "/tools/generate", priority: 0.8 },
+  { path: "/i", priority: 0.9 },
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
-  return ROUTES.map((r) => ({
+  const items: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
     url: `${siteConfig.url}${r.path}`,
     lastModified,
-    changeFrequency: "weekly",
+    changeFrequency: "weekly" as const,
     priority: r.priority,
   }));
+
+  // 行业 hub
+  for (const ind of INDUSTRIES) {
+    items.push({
+      url: `${siteConfig.url}/i/${ind.slug}`,
+      lastModified,
+      changeFrequency: "daily",
+      priority: 0.8,
+    });
+  }
+
+  // 已发布的行业博客文章
+  try {
+    const posts = await db
+      .select({ industry: schema.blogPosts.industry, slug: schema.blogPosts.slug, publishedAt: schema.blogPosts.publishedAt })
+      .from(schema.blogPosts)
+      .where(eq(schema.blogPosts.status, "published"))
+      .limit(5000);
+    for (const p of posts) {
+      items.push({
+        url: `${siteConfig.url}/i/${p.industry}/${p.slug}`,
+        lastModified: p.publishedAt ?? lastModified,
+        changeFrequency: "monthly",
+        priority: 0.7,
+      });
+    }
+  } catch (e) {
+    // build 阶段 DB 不可用时跳过
+    console.warn("[sitemap] db unavailable:", e);
+  }
+
+  return items;
 }
