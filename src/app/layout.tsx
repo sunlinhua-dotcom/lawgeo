@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { Toaster } from "sonner";
 import { Nav } from "@/components/layout/nav";
 import { Footer } from "@/components/layout/footer";
+import { CommandMenu } from "@/components/layout/command-menu";
 import { JsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/lib/site";
 import {
@@ -75,8 +77,22 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans">
         <JsonLd data={[organizationSchema(), websiteSchema(), softwareApplicationSchema()]} />
         <Nav />
+        <CommandMenu />
         <main className="flex-1">{children}</main>
         <Footer />
+        <Toaster
+          position="top-center"
+          richColors
+          closeButton
+          toastOptions={{
+            classNames: {
+              toast:
+                "!bg-white/90 !backdrop-blur-xl !border !border-slate-200/80 !shadow-xl dark:!bg-slate-900/95 dark:!border-slate-800",
+              title: "!text-sm !font-semibold",
+              description: "!text-xs",
+            },
+          }}
+        />
       </body>
     </html>
   );
