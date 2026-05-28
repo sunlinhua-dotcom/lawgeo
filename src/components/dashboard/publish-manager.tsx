@@ -11,6 +11,8 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  Rocket,
+  Plug,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -82,6 +84,7 @@ export function PublishManager({
 
   return (
     <div className="space-y-6">
+      <OverseasAutoPanel drafts={drafts} selectedDraft={selectedDraft} setSelectedDraft={setSelectedDraft} />
       <Card>
         <CardHeader>
           <CardTitle className="text-base">1. 选择要分发的内容</CardTitle>
@@ -165,6 +168,137 @@ export function PublishManager({
         </div>
       </div>
     </div>
+  );
+}
+
+function OverseasAutoPanel({
+  drafts,
+  selectedDraft,
+  setSelectedDraft,
+}: {
+  drafts: ContentDraft[];
+  selectedDraft: string | null;
+  setSelectedDraft: (id: string | null) => void;
+}) {
+  const router = useRouter();
+  const [platforms, setPlatforms] = useState<string[]>(["devto", "hashnode", "medium"]);
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<Array<{ platform: string; ok: boolean; url?: string; error?: string }> | null>(null);
+
+  async function autoPub() {
+    if (!selectedDraft || platforms.length === 0) return;
+    setBusy(true);
+    setResult(null);
+    try {
+      const res = await fetch("/api/publish/auto", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ draftId: selectedDraft, platforms, publish: true }),
+      });
+      const data = await res.json();
+      setResult(data.results);
+      router.refresh();
+    } catch (e) {
+      setResult([{ platform: "all", ok: false, error: e instanceof Error ? e.message : "失败" }]);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-teal-50 dark:border-emerald-900 dark:from-emerald-950 dark:to-teal-950">
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between text-base">
+          <span className="flex items-center gap-2">
+            <Rocket className="h-5 w-5 text-emerald-600" />
+            🌍 海外平台一键自动发布（真实 API）
+          </span>
+          <Link href="/dashboard/integrations" className="text-xs text-indigo-600 hover:underline flex items-center gap-1">
+            <Plug className="h-3 w-3" /> 配置 API token
+          </Link>
+        </CardTitle>
+        <p className="text-xs text-slate-600 dark:text-slate-400">
+          已对接 Dev.to / Hashnode / Medium 真实 API。先在「海外平台 API」配置 token 后，可直接一键发布。
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600">选择 draft</label>
+          <select
+            value={selectedDraft ?? ""}
+            onChange={(e) => setSelectedDraft(e.target.value)}
+            className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900"
+          >
+            {drafts.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.title} · {d.format.toUpperCase()}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-600">目标平台</label>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: "devto", label: "Dev.to" },
+              { id: "hashnode", label: "Hashnode" },
+              { id: "medium", label: "Medium" },
+            ].map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setPlatforms((s) => (s.includes(p.id) ? s.filter((x) => x !== p.id) : [...s, p.id]))}
+                className={`rounded-md border px-3 py-1.5 text-xs transition-colors ${
+                  platforms.includes(p.id)
+                    ? "border-emerald-500 bg-emerald-100 dark:border-emerald-400 dark:bg-emerald-900"
+                    : "border-slate-200 dark:border-slate-700"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <Button
+          onClick={autoPub}
+          disabled={busy || !selectedDraft || platforms.length === 0}
+          variant="primary"
+          size="lg"
+          className="w-full bg-emerald-600 hover:bg-emerald-700"
+        >
+          {busy ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> 自动发布中…</>
+          ) : (
+            <><Rocket className="mr-2 h-4 w-4" /> 一键自动发布到 {platforms.length} 个平台</>
+          )}
+        </Button>
+        {result && (
+          <div className="space-y-1.5">
+            {result.map((r) => (
+              <div
+                key={r.platform}
+                className={`rounded-lg border px-3 py-2 text-xs ${
+                  r.ok
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200"
+                    : "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200"
+                }`}
+              >
+                <span className="font-semibold">{r.platform}: </span>
+                {r.ok ? (
+                  <>
+                    ✅ 已发布 ·{" "}
+                    <a href={r.url} target="_blank" rel="noreferrer" className="underline">
+                      {r.url} <ExternalLink className="inline h-3 w-3" />
+                    </a>
+                  </>
+                ) : (
+                  <>❌ {r.error}</>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LayoutDashboard, Search, Sparkles, Bot, Database, Users, LogOut, Building2, BellRing, Share2, CreditCard, BookOpen, Link2, FileBarChart, Workflow } from "lucide-react";
+import { LayoutDashboard, Search, Sparkles, Bot, Database, Users, LogOut, Building2, BellRing, Share2, CreditCard, BookOpen, Link2, FileBarChart, Workflow, Plug } from "lucide-react";
 import { getSession } from "@/lib/auth";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -21,6 +21,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             { href: "/dashboard/keywords", label: "关键词矩阵", icon: Database },
             { href: "/dashboard/knowledge", label: "品牌知识库", icon: BookOpen },
             { href: "/dashboard/publish", label: "多平台发布", icon: Share2 },
+            { href: "/dashboard/integrations", label: "海外平台 API", icon: Plug },
             { href: "/dashboard/conversion", label: "转化追踪", icon: Link2 },
             { href: "/dashboard/agents", label: "AI Agent 编排", icon: Workflow },
             { href: "/dashboard/reports", label: "月度报告", icon: FileBarChart },

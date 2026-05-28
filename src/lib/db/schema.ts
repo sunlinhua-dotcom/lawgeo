@@ -291,6 +291,29 @@ export const conversionEvents = sqliteTable(
   ],
 );
 
+// ── 第三方平台凭证（用于自动发布） ─────────────────────────────────
+export const publishCredentials = sqliteTable(
+  "publish_credentials",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    platform: text("platform").notNull(), // devto/hashnode/medium/wordpress/ghost
+    token: text("token").notNull(), // 加密存储更佳，这里 demo 明文
+    accountId: text("account_id"), // 例如 hashnode publicationId / medium userId
+    accountName: text("account_name"),
+    verifiedAt: integer("verified_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [
+    index("creds_user_idx").on(t.userId),
+    uniqueIndex("creds_user_platform").on(t.userId, t.platform),
+  ],
+);
+
 // ── 告警订阅 ───────────────────────────────────────────────────────
 export const alertSubscriptions = sqliteTable(
   "alert_subscriptions",
@@ -415,3 +438,4 @@ export type KnowledgeDoc = typeof knowledgeDocs.$inferSelect;
 export type KnowledgeChunk = typeof knowledgeChunks.$inferSelect;
 export type ConversionLink = typeof conversionLinks.$inferSelect;
 export type ConversionEvent = typeof conversionEvents.$inferSelect;
+export type PublishCredential = typeof publishCredentials.$inferSelect;
