@@ -20,6 +20,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { faqSchema, breadcrumbSchema } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 import { HomeAuditDemo } from "@/components/home/audit-demo";
+import { MarketStats } from "@/components/home/market-stats";
 
 const products = [
   {
@@ -166,6 +167,9 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* ── 市场规模数据 ─────────────────────────────────────────────── */}
+      <MarketStats />
 
       {/* ── Live audit demo ─────────────────────────────────────────── */}
       <section className="border-b border-slate-100 dark:border-slate-900">

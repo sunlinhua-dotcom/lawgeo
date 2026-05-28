@@ -195,6 +195,102 @@ export const usageMonth = sqliteTable(
   ],
 );
 
+// ── 品牌知识库 ─────────────────────────────────────────────────────
+export const knowledgeDocs = sqliteTable(
+  "knowledge_docs",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    projectId: text("project_id").references(() => projects.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    sourceUrl: text("source_url"),
+    sourceType: text("source_type", {
+      enum: ["upload", "url", "manual"],
+    })
+      .notNull()
+      .default("manual"),
+    sizeBytes: integer("size_bytes"),
+    chunkCount: integer("chunk_count").notNull().default(0),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [index("kn_user_idx").on(t.userId), index("kn_proj_idx").on(t.projectId)],
+);
+
+export const knowledgeChunks = sqliteTable(
+  "knowledge_chunks",
+  {
+    id: text("id").primaryKey(),
+    docId: text("doc_id")
+      .notNull()
+      .references(() => knowledgeDocs.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    chunkIdx: integer("chunk_idx").notNull(),
+    text: text("text").notNull(),
+    tokens: integer("tokens"),
+    /** BM25-style 词频缓存 + 字符 trigrams（JSON 数组） */
+    keywords: text("keywords"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [index("kc_doc_idx").on(t.docId), index("kc_user_idx").on(t.userId)],
+);
+
+// ── 转化追踪 ───────────────────────────────────────────────────────
+export const conversionLinks = sqliteTable(
+  "conversion_links",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    projectId: text("project_id").references(() => projects.id, { onDelete: "set null" }),
+    shortCode: text("short_code").notNull().unique(),
+    targetUrl: text("target_url").notNull(),
+    label: text("label"),
+    source: text("source"), // 'ai-recommend' / 'organic' / 'zhihu' / ...
+    campaign: text("campaign"),
+    clicks: integer("clicks").notNull().default(0),
+    conversions: integer("conversions").notNull().default(0),
+    valueCents: integer("value_cents").notNull().default(0),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [index("conv_user_idx").on(t.userId), index("conv_code_idx").on(t.shortCode)],
+);
+
+export const conversionEvents = sqliteTable(
+  "conversion_events",
+  {
+    id: text("id").primaryKey(),
+    linkId: text("link_id").references(() => conversionLinks.id, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    eventType: text("event_type", {
+      enum: ["click", "view", "lead", "signup", "purchase"],
+    }).notNull(),
+    source: text("source"),
+    metadata: text("metadata"), // JSON
+    valueCents: integer("value_cents").notNull().default(0),
+    ip: text("ip"),
+    userAgent: text("user_agent"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [
+    index("conv_evt_link_idx").on(t.linkId),
+    index("conv_evt_user_idx").on(t.userId),
+    index("conv_evt_date_idx").on(t.createdAt),
+  ],
+);
+
 // ── 告警订阅 ───────────────────────────────────────────────────────
 export const alertSubscriptions = sqliteTable(
   "alert_subscriptions",
@@ -315,3 +411,7 @@ export type PublishTarget = typeof publishTargets.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
 export type UsageMonth = typeof usageMonth.$inferSelect;
 export type AlertSubscription = typeof alertSubscriptions.$inferSelect;
+export type KnowledgeDoc = typeof knowledgeDocs.$inferSelect;
+export type KnowledgeChunk = typeof knowledgeChunks.$inferSelect;
+export type ConversionLink = typeof conversionLinks.$inferSelect;
+export type ConversionEvent = typeof conversionEvents.$inferSelect;

@@ -1,58 +1,93 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Scale, Building2, Globe, Sparkles, ArrowRight } from "lucide-react";
 import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbSchema } from "@/lib/seo";
+import { CASES } from "@/data/cases";
+import { ArrowRight, Scale, GraduationCap, Coffee, Smartphone, Megaphone, Store, Landmark, Globe, Building2 } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "行业方案 — 律所 / SME / B2B / 本地生活",
-  description: "lawGEO 行业 GEO 方案总览：律所主打方向、中小企业方案、B2B 制造业、本地生活与教育培训。",
-  alternates: { canonical: "/cases" },
+const ICONS: Record<string, React.ElementType> = {
+  lawyer: Scale,
+  education: GraduationCap,
+  fmcg: Coffee,
+  "consumer-electronics": Smartphone,
+  adtech: Megaphone,
+  franchise: Store,
+  finance: Landmark,
+  "ai-saas-overseas": Globe,
 };
 
-const cases = [
-  { icon: Scale, href: "/cases/lawyer", title: "律所 / 法律服务", desc: "国内首家律所深度定制方案：案由词库 × 地域矩阵 × 合规审查模板。", featured: true },
-  { icon: Building2, href: "/cases/sme", title: "中小企业 / 专业服务", desc: "低成本高 ROI 的 GEO 起步方案，适合财税、咨询、专业服务。" },
-  { icon: Globe, href: "/cases/b2b", title: "B2B / 制造业", desc: "长决策周期场景的 AI 推荐占位，覆盖采购决策链路。" },
-  { icon: Sparkles, href: "/cases/local", title: "本地生活 / 医美 / 教育", desc: "LBS + AI 双引擎，覆盖区域咨询决策。" },
-];
+export const metadata: Metadata = {
+  title: "行业方案 / 标杆案例 — 8 大行业 GEO 增长记录",
+  description: "lawGEO 在 8 大行业的真实标杆案例：律所 / 教育 / 快消 / 消费电子 / 广告媒体 / 招商加盟 / 金融 / AI 出海。",
+  alternates: { canonical: "/cases" },
+};
 
 export default function CasesPage() {
   return (
     <>
       <JsonLd data={breadcrumbSchema([{ name: "首页", path: "/" }, { name: "行业方案", path: "/cases" }])} />
       <PageHero
-        badge="行业方案"
-        title={<>不只律所，<span className="gradient-text">高决策成本</span>行业都需要 GEO</>}
-        description="按行业特点定制的 GEO 方案。律所是主打方向，其他三类是通用扩展。"
+        badge="8 大行业 · 真实标杆案例"
+        title={<>不只律所，<span className="gradient-text">所有高决策行业</span>都需要 GEO</>}
+        description="每个案例都附完整的客户背景、优化策略与达成数字。点击进入查看详细路径。"
       />
-      <section className="mx-auto max-w-5xl px-4 py-16 lg:px-8">
-        <div className="grid gap-6 sm:grid-cols-2">
-          {cases.map((c) => {
-            const Icon = c.icon;
+      <section className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {CASES.map((c) => {
+            const Icon = ICONS[c.slug] ?? Building2;
+            const isFeatured = c.slug === "lawyer";
             return (
-              <Link key={c.href} href={c.href}>
-                <Card className={`lift h-full ${c.featured ? "border-indigo-300 bg-gradient-to-br from-indigo-50 to-white dark:border-indigo-900 dark:from-indigo-950 dark:to-slate-900" : ""}`}>
+              <Link key={c.slug} href={`/cases/${c.slug}`}>
+                <Card className={`lift h-full ${isFeatured ? "border-indigo-300 bg-gradient-to-br from-indigo-50 to-white dark:border-indigo-900 dark:from-indigo-950 dark:to-slate-900" : ""}`}>
                   <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <Icon className="h-7 w-7 text-indigo-600" />
-                      {c.featured && <Badge variant="primary">主打</Badge>}
+                    <div className="flex items-start justify-between">
+                      <Icon className="h-8 w-8 text-indigo-600" />
+                      <div className="flex flex-col gap-1 items-end">
+                        {isFeatured && <Badge variant="primary">主打行业</Badge>}
+                        <Badge variant="outline">{c.industryEn}</Badge>
+                      </div>
                     </div>
-                    <CardTitle>{c.title}</CardTitle>
-                    <CardDescription>{c.desc}</CardDescription>
+                    <CardTitle className="mt-3">{c.industry}</CardTitle>
+                    <CardDescription className="leading-relaxed">{c.hero}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <span className="inline-flex items-center gap-1 text-sm text-indigo-600">
-                      查看方案 <ArrowRight className="h-3 w-3" />
-                    </span>
+                    <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800/50">
+                      <div className="num text-2xl font-semibold text-indigo-600">{c.highlightMetric.value}</div>
+                      <div className="text-xs text-slate-500">{c.highlightMetric.label}</div>
+                    </div>
+                    <div className="mt-4 flex items-center text-sm text-indigo-600">
+                      查看详情 <ArrowRight className="ml-1 h-3 w-3" />
+                    </div>
                   </CardContent>
                 </Card>
               </Link>
             );
           })}
+        </div>
+
+        <div className="mt-16 text-center">
+          <h2 className="text-2xl font-semibold">你的行业不在上面？</h2>
+          <p className="mt-3 text-slate-600 dark:text-slate-400">
+            GEO 适用于所有「高决策成本 + 信息查询」行业。<br />
+            预约 1v1 顾问，我们给你定制行业方案。
+          </p>
+          <div className="mt-6 flex justify-center gap-3">
+            <Link
+              href="/tools/audit"
+              className="inline-flex items-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 px-7 py-3 text-base font-semibold text-white shadow-md"
+            >
+              免费跑诊断
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex items-center rounded-xl border border-slate-200 px-7 py-3 text-base font-medium text-slate-700 dark:border-slate-700 dark:text-slate-200"
+            >
+              预约顾问
+            </Link>
+          </div>
         </div>
       </section>
     </>

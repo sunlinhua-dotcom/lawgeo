@@ -7,6 +7,23 @@
 
 export type ContentFormat = "faq" | "tldr" | "howto" | "compare" | "article" | "answer";
 
+export type Locale = "zh" | "en" | "es" | "fr" | "de" | "ja";
+
+export const LOCALES: Record<Locale, { label: string; flag: string; nativeName: string; geoFocus: string }> = {
+  zh: { label: "简体中文", flag: "🇨🇳", nativeName: "简体中文", geoFocus: "DeepSeek / 文心 / 通义 / 豆包 / Kimi" },
+  en: { label: "English", flag: "🇺🇸", nativeName: "English", geoFocus: "ChatGPT / Claude / Gemini / Perplexity" },
+  es: { label: "Español", flag: "🇪🇸", nativeName: "Español", geoFocus: "ChatGPT / Claude / Gemini" },
+  fr: { label: "Français", flag: "🇫🇷", nativeName: "Français", geoFocus: "ChatGPT / Claude / Gemini / Mistral Le Chat" },
+  de: { label: "Deutsch", flag: "🇩🇪", nativeName: "Deutsch", geoFocus: "ChatGPT / Claude / Gemini / Aleph Alpha" },
+  ja: { label: "日本語", flag: "🇯🇵", nativeName: "日本語", geoFocus: "ChatGPT / Claude / Gemini" },
+};
+
+function localeInstruction(locale: Locale): string {
+  if (locale === "zh") return "";
+  const meta = LOCALES[locale];
+  return `\n\n## Output language: ${meta.nativeName} (${meta.label})\n你输出的所有内容必须用 ${meta.nativeName} 撰写，母语级表达，不带翻译腔。目标 AI 平台：${meta.geoFocus}。所有 schema.org JSON-LD 字段值也用此语言。`;
+}
+
 const GEO_SYSTEM_BASE = `你是 lawGEO 的 GEO 内容生成专家。你的任务是把用户提供的素材，改写成「最容易被大模型引用」的中文内容。
 
 GEO 写作原则（必须遵守）：
@@ -28,12 +45,14 @@ export function buildPrompt(opts: {
   context?: string;
   region?: string;
   caseType?: string;
+  locale?: Locale;
 }): { system: string; user: string } {
   const formatInstructions = FORMAT_RULES[opts.format];
   const localizer = opts.region
     ? `\n本内容针对地域：${opts.region}。请在标题、首段、FAQ 中体现地域。`
     : "";
   const caseHint = opts.caseType ? `\n本内容针对的案由：${opts.caseType}。` : "";
+  const locale = opts.locale ?? "zh";
 
   const user = `话题：${opts.topic}${localizer}${caseHint}
 
@@ -45,7 +64,7 @@ ${formatInstructions}
 
 注意：只输出最终内容，不要输出"以下是…"这种引导语；不要包裹 markdown 代码块。`;
 
-  return { system: GEO_SYSTEM_BASE, user };
+  return { system: GEO_SYSTEM_BASE + localeInstruction(locale), user };
 }
 
 const FORMAT_RULES: Record<ContentFormat, string> = {

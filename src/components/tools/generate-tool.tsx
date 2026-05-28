@@ -7,7 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import type { ContentFormat } from "@/lib/prompts";
+import type { ContentFormat, Locale } from "@/lib/prompts";
+
+const LOCALES: Array<{ id: Locale; label: string; flag: string }> = [
+  { id: "zh", label: "中文", flag: "🇨🇳" },
+  { id: "en", label: "English", flag: "🇺🇸" },
+  { id: "es", label: "Español", flag: "🇪🇸" },
+  { id: "fr", label: "Français", flag: "🇫🇷" },
+  { id: "de", label: "Deutsch", flag: "🇩🇪" },
+  { id: "ja", label: "日本語", flag: "🇯🇵" },
+];
 
 const FORMATS: Array<{ id: ContentFormat; label: string; desc: string }> = [
   { id: "faq", label: "FAQ 问答", desc: "6–10 组 Q&A + FAQPage JSON-LD" },
@@ -31,6 +40,7 @@ export function GenerateTool() {
   const [region, setRegion] = useState("");
   const [caseType, setCaseType] = useState("");
   const [context, setContext] = useState("");
+  const [locale, setLocale] = useState<Locale>("zh");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ content: string; jsonLd: string | null; latencyMs: number } | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -44,7 +54,7 @@ export function GenerateTool() {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ format, topic, region: region || undefined, caseType: caseType || undefined, context: context || undefined }),
+        body: JSON.stringify({ format, topic, region: region || undefined, caseType: caseType || undefined, context: context || undefined, locale }),
       });
       if (!res.ok) throw new Error(await res.text());
       setResult(await res.json());
@@ -92,6 +102,25 @@ export function GenerateTool() {
             <CardTitle className="text-base">输入</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-600">输出语言</label>
+              <div className="flex flex-wrap gap-1.5">
+                {LOCALES.map((l) => (
+                  <button
+                    key={l.id}
+                    onClick={() => setLocale(l.id)}
+                    disabled={loading}
+                    className={`rounded-md px-2.5 py-1 text-xs transition-colors ${
+                      locale === l.id
+                        ? "bg-indigo-600 text-white"
+                        : "border border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+                    }`}
+                  >
+                    {l.flag} {l.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-600">话题 / 关键词 *</label>
               <Input

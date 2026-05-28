@@ -46,16 +46,20 @@ export const siteConfig = {
         { href: "/publish", label: "多平台发布" },
         { href: "/monitor", label: "AI 引用监测" },
         { href: "/tools/audit", label: "免费 GEO 诊断" },
+        { href: "/tools/intent", label: "意图聚类" },
         { href: "/tools/matrix", label: "律所关键词矩阵" },
+        { href: "/tools/compare", label: "12 平台对比" },
       ],
     },
     {
       title: "方案",
       items: [
         { href: "/cases/lawyer", label: "律所 GEO 方案" },
-        { href: "/cases/sme", label: "中小企业方案" },
-        { href: "/cases/b2b", label: "B2B 方案" },
-        { href: "/cases/local", label: "本地生活方案" },
+        { href: "/cases/education", label: "教育培训案例" },
+        { href: "/cases/fmcg", label: "快消案例" },
+        { href: "/cases/finance", label: "金融案例" },
+        { href: "/cases/overseas", label: "GEO 出海" },
+        { href: "/cases", label: "全部案例 →" },
       ],
     },
     {
@@ -73,6 +77,9 @@ export const siteConfig = {
       title: "公司",
       items: [
         { href: "/about", label: "关于我们" },
+        { href: "/team", label: "核心团队" },
+        { href: "/process", label: "服务流程" },
+        { href: "/market-insights", label: "行业洞察" },
         { href: "/why", label: "为什么选择 lawGEO" },
         { href: "/contact", label: "联系我们" },
         { href: "/pricing", label: "定价方案" },

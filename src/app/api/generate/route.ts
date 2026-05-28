@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { ask } from "@/lib/ai";
-import { buildPrompt, extractJsonLd, type ContentFormat } from "@/lib/prompts";
+import { buildPrompt, extractJsonLd, type ContentFormat, type Locale } from "@/lib/prompts";
 import { db, schema } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { incUsage, checkQuota } from "@/lib/usage";
+import { retrieve, buildContext } from "@/lib/rag";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,6 +18,8 @@ interface Body {
   region?: string;
   caseType?: string;
   projectId?: string;
+  useKnowledge?: boolean;
+  locale?: Locale;
 }
 
 const VALID_FORMATS: ContentFormat[] = ["faq", "tldr", "howto", "compare", "article", "answer"];
@@ -50,7 +53,26 @@ export async function POST(req: Request) {
     }
   }
 
-  const { system, user } = buildPrompt(body);
+  let { system, user } = buildPrompt(body);
+
+  // 自动注入知识库 (RAG)
+  if (session && body.useKnowledge !== false) {
+    try {
+      const hits = await retrieve({
+        userId: session.userId,
+        query: body.topic + (body.context ?? ""),
+        topK: 5,
+        projectId: body.projectId,
+      });
+      const ctx = buildContext(hits);
+      if (ctx) {
+        system = `${system}\n\n${ctx}`;
+      }
+    } catch (e) {
+      console.warn("[generate] RAG retrieve failed:", e);
+    }
+  }
+
   try {
     const t0 = Date.now();
     const r = await ask({ prompt: user, system, temperature: 0.6 });
