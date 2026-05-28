@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 import { ask, type AiPlatformId } from "@/lib/ai";
+import { db, schema } from "@/lib/db";
+import { getSession } from "@/lib/auth";
+import { incUsage } from "@/lib/usage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,6 +28,9 @@ interface Body {
   question: string;
   platforms?: AiPlatformId[];
   brand?: string;
+  projectId?: string;
+  keywordId?: string;
+  source?: string;
 }
 
 const DETECT_PROMPT = (q: string, brand?: string) =>
@@ -46,23 +53,50 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "请至少选择一个平台" }, { status: 400 });
   }
 
+  const session = await getSession();
+
   const tasks = platforms.map(async (platform) => {
     const t0 = Date.now();
+    const prompt = DETECT_PROMPT(body.question, body.brand);
     try {
       const r = await ask({
-        prompt: DETECT_PROMPT(body.question, body.brand),
+        prompt,
         platform,
         temperature: 0.55,
       });
       const cited = body.brand ? r.text.includes(body.brand) : false;
-      const rank = cited ? estimateRank(r.text, body.brand!) : null;
+      const rank = cited && body.brand ? estimateRank(r.text, body.brand) : null;
+      const latency = Date.now() - t0;
+
+      // 持久化
+      try {
+        await db.insert(schema.aiQueries).values({
+          id: randomUUID(),
+          userId: session?.userId ?? null,
+          projectId: body.projectId ?? null,
+          keywordId: body.keywordId ?? null,
+          question: body.question,
+          brand: body.brand ?? null,
+          platform,
+          model: "mimo-v2.5-pro",
+          prompt,
+          response: r.text.slice(0, 8000),
+          cited,
+          rank,
+          latencyMs: latency,
+          source: body.source ?? "compare",
+        });
+      } catch (e) {
+        console.warn("[compare] persist failed:", e);
+      }
+
       return {
         platform,
         ok: true,
         text: r.text,
         cited,
         rank,
-        latencyMs: Date.now() - t0,
+        latencyMs: latency,
       };
     } catch (e: unknown) {
       return {
@@ -75,6 +109,13 @@ export async function POST(req: Request) {
   });
 
   const results = await Promise.all(tasks);
+
+  if (session) {
+    try {
+      await incUsage(session.userId, "queries", results.filter((r) => r.ok).length);
+    } catch {}
+  }
+
   return NextResponse.json({
     question: body.question,
     brand: body.brand,
@@ -88,7 +129,6 @@ export async function POST(req: Request) {
 function estimateRank(text: string, brand: string): number | null {
   const idx = text.indexOf(brand);
   if (idx < 0) return null;
-  // 如果出现在前 200 字符 = Top 1，前 500 字符 = Top 2，否则 Top 3+
   if (idx < 200) return 1;
   if (idx < 500) return 2;
   return 3;

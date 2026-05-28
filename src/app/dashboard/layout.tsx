@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LayoutDashboard, Search, Sparkles, Bot, Database, Users, LogOut } from "lucide-react";
+import { LayoutDashboard, Search, Sparkles, Bot, Database, Users, LogOut, Building2, BellRing, Share2, CreditCard } from "lucide-react";
 import { getSession } from "@/lib/auth";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -14,11 +14,15 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <nav className="space-y-1 text-sm">
           {[
             { href: "/dashboard", label: "概览", icon: LayoutDashboard },
+            { href: "/dashboard/projects", label: "项目管理", icon: Building2 },
             { href: "/dashboard/audits", label: "诊断历史", icon: Search },
             { href: "/dashboard/generate", label: "AI 内容生成", icon: Sparkles },
             { href: "/dashboard/monitor", label: "AI 引用监测", icon: Bot },
             { href: "/dashboard/keywords", label: "关键词矩阵", icon: Database },
+            { href: "/dashboard/publish", label: "多平台发布", icon: Share2 },
+            { href: "/dashboard/alerts", label: "邮件告警", icon: BellRing },
             { href: "/dashboard/leads", label: "线索", icon: Users },
+            { href: "/dashboard/billing", label: "套餐 / 用量", icon: CreditCard },
           ].map((it) => {
             const Icon = it.icon;
             return (

@@ -77,9 +77,11 @@ export const aiQueries = sqliteTable(
   "ai_queries",
   {
     id: text("id").primaryKey(),
-    keywordId: text("keyword_id")
-      .notNull()
-      .references(() => keywords.id, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    projectId: text("project_id").references(() => projects.id, { onDelete: "set null" }),
+    keywordId: text("keyword_id").references(() => keywords.id, { onDelete: "set null" }),
+    question: text("question"), // 标准化后的问题（与 keyword 解耦）
+    brand: text("brand"), // 监测的品牌词
     platform: text("platform").notNull(), // deepseek/qwen/doubao/claude...
     model: text("model"),
     prompt: text("prompt").notNull(),
@@ -90,15 +92,129 @@ export const aiQueries = sqliteTable(
     competitorsCited: text("competitors_cited"), // JSON array
     cost: real("cost"),
     latencyMs: integer("latency_ms"),
+    source: text("source"), // compare / cron / monitor
     queriedAt: integer("queried_at", { mode: "timestamp" })
       .notNull()
       .default(sql`(unixepoch())`),
   },
   (t) => [
     index("queries_keyword_idx").on(t.keywordId),
+    index("queries_project_idx").on(t.projectId),
+    index("queries_user_idx").on(t.userId),
     index("queries_platform_idx").on(t.platform),
     index("queries_date_idx").on(t.queriedAt),
   ],
+);
+
+// ── 监测计划（每日跑哪些项目的哪些关键词） ─────────────────────────
+export const monitorJobs = sqliteTable(
+  "monitor_jobs",
+  {
+    id: text("id").primaryKey(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    platforms: text("platforms").notNull(), // JSON array
+    schedule: text("schedule").notNull().default("daily"), // daily/hourly/weekly
+    lastRunAt: integer("last_run_at", { mode: "timestamp" }),
+    nextRunAt: integer("next_run_at", { mode: "timestamp" }),
+    enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [
+    index("jobs_project_idx").on(t.projectId),
+    index("jobs_next_idx").on(t.nextRunAt),
+  ],
+);
+
+// ── 发布目标（同一个 draft 在多平台的发布状态） ───────────────────
+export const publishTargets = sqliteTable(
+  "publish_targets",
+  {
+    id: text("id").primaryKey(),
+    draftId: text("draft_id")
+      .notNull()
+      .references(() => contentDrafts.id, { onDelete: "cascade" }),
+    platform: text("platform").notNull(), // zhihu/baijiahao/wechat/xiaohongshu/toutiao/shipinhao/bilibili
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    excerpt: text("excerpt"),
+    tags: text("tags"), // JSON array
+    status: text("status", { enum: ["draft", "ready", "published", "failed"] })
+      .notNull()
+      .default("draft"),
+    publishedUrl: text("published_url"),
+    publishedAt: integer("published_at", { mode: "timestamp" }),
+    error: text("error"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [index("publish_draft_idx").on(t.draftId), index("publish_platform_idx").on(t.platform)],
+);
+
+// ── 订阅与额度 ────────────────────────────────────────────────────
+export const subscriptions = sqliteTable(
+  "subscriptions",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    plan: text("plan", { enum: ["trial", "starter", "standard", "enterprise"] })
+      .notNull()
+      .default("trial"),
+    quotaKeywords: integer("quota_keywords").notNull().default(5),
+    quotaGenerationsPerMonth: integer("quota_generations_per_month").notNull().default(5),
+    quotaPlatforms: integer("quota_platforms").notNull().default(4),
+    expiresAt: integer("expires_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [index("subs_user_idx").on(t.userId)],
+);
+
+export const usageMonth = sqliteTable(
+  "usage_month",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    yearMonth: text("year_month").notNull(), // "2026-05"
+    generations: integer("generations").notNull().default(0),
+    queries: integer("queries").notNull().default(0),
+    audits: integer("audits").notNull().default(0),
+    costCents: integer("cost_cents").notNull().default(0),
+  },
+  (t) => [
+    uniqueIndex("usage_unique").on(t.userId, t.yearMonth),
+  ],
+);
+
+// ── 告警订阅 ───────────────────────────────────────────────────────
+export const alertSubscriptions = sqliteTable(
+  "alert_subscriptions",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    projectId: text("project_id").references(() => projects.id, { onDelete: "cascade" }),
+    type: text("type", {
+      enum: ["citation_drop", "top3_lost", "competitor_overtake", "weekly_digest"],
+    }).notNull(),
+    email: text("email").notNull(),
+    enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+    lastSentAt: integer("last_sent_at", { mode: "timestamp" }),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [index("alerts_user_idx").on(t.userId)],
 );
 
 // ── 内容草稿 ─────────────────────────────────────────────────────────────
@@ -106,9 +222,10 @@ export const contentDrafts = sqliteTable(
   "content_drafts",
   {
     id: text("id").primaryKey(),
-    projectId: text("project_id")
-      .notNull()
-      .references(() => projects.id, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    projectId: text("project_id").references(() => projects.id, {
+      onDelete: "set null",
+    }),
     keywordId: text("keyword_id").references(() => keywords.id, {
       onDelete: "set null",
     }),
@@ -128,7 +245,7 @@ export const contentDrafts = sqliteTable(
       .notNull()
       .default(sql`(unixepoch())`),
   },
-  (t) => [index("drafts_project_idx").on(t.projectId)],
+  (t) => [index("drafts_project_idx").on(t.projectId), index("drafts_user_idx").on(t.userId)],
 );
 
 // ── 域名诊断报告 ────────────────────────────────────────────────────────
@@ -193,3 +310,8 @@ export type Audit = typeof audits.$inferSelect;
 export type Lead = typeof leads.$inferSelect;
 export type CaseCategory = typeof caseCategories.$inferSelect;
 export type Region = typeof regions.$inferSelect;
+export type MonitorJob = typeof monitorJobs.$inferSelect;
+export type PublishTarget = typeof publishTargets.$inferSelect;
+export type Subscription = typeof subscriptions.$inferSelect;
+export type UsageMonth = typeof usageMonth.$inferSelect;
+export type AlertSubscription = typeof alertSubscriptions.$inferSelect;
