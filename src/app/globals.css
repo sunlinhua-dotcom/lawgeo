@@ -1,26 +1,95 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@plugin "@tailwindcss/typography";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: 255 255 255;
+  --color-foreground: 2 6 23;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", monospace;
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── 中文排版默认规则（djhh） ──────────────────────────────────────── */
+:root {
+  --font-cn: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
+    "Source Han Sans SC", sans-serif;
 }
 
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+p, li, td, th, dd, dt {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* 数字、价格、百分比单位不跨行 */
+.no-wrap-num,
+.num,
+[data-num] {
+  white-space: nowrap;
+}
+
+/* 段落最大宽度，保证不出现孤字单行 */
+.prose-cn p {
+  max-width: 42ch;
+}
+
+.prose-cn p,
+.prose-cn li {
+  line-height: 1.85;
+}
+
+/* Hanging punctuation */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  hanging-punctuation: allow-end last;
+}
+
+/* 滚动条更细 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(148 163 184 / 0.4);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139 / 0.6);
+}
+
+/* Section dividers */
+.dotgrid {
+  background-image: radial-gradient(circle, rgb(148 163 184 / 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.gradient-text {
+  background-image: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Card hover lift */
+.lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -8px rgb(99 102 241 / 0.18);
 }
