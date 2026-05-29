@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/footer";
 import { CommandMenu } from "@/components/layout/command-menu";
 import { JsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/lib/site";
+import { getSession } from "@/lib/auth";
 import {
   organizationSchema,
   websiteSchema,
@@ -55,28 +56,28 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#020617" },
-  ],
+  themeColor: "#ffffff",
   width: "device-width",
   initialScale: 1,
+  colorScheme: "light",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getSession();
   return (
-    <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
+    <html lang="zh-CN" className="h-full antialiased light" style={{ colorScheme: "light" }} suppressHydrationWarning>
       <head>
         <link rel="llms-txt" href="/llms.txt" />
         <link rel="alternate" type="text/markdown" href="/llms.txt" />
+        <meta name="color-scheme" content="light" />
       </head>
-      <body className="min-h-full flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 font-sans">
+      <body className="min-h-full flex flex-col bg-white text-slate-900 font-sans">
         <JsonLd data={[organizationSchema(), websiteSchema(), softwareApplicationSchema()]} />
-        <Nav />
+        <Nav user={session ? { email: session.email } : null} />
         <CommandMenu />
         <main className="flex-1">{children}</main>
         <Footer />

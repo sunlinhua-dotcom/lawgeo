@@ -8,8 +8,8 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   const { email, password } = (await req.json()) as { email: string; password: string };
-  if (!email || !password || password.length < 6) {
-    return NextResponse.json({ error: "邮箱或密码格式错误" }, { status: 400 });
+  if (!email || !password) {
+    return NextResponse.json({ error: "邮箱和密码不能为空" }, { status: 400 });
   }
   const exists = await db
     .select({ id: schema.users.id })

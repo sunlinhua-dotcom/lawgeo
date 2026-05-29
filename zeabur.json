@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.zeabur.app/template.json",
+  "name": "lawgeo",
+  "description": "律所 GEO 优化平台",
+  "build": {
+    "command": "pnpm install --frozen-lockfile && pnpm db:push && pnpm build"
+  },
+  "start": {
+    "command": "pnpm start"
+  },
+  "healthCheck": {
+    "path": "/api/health",
+    "interval": 30
+  },
+  "volumes": [
+    {
+      "id": "data",
+      "dir": "/data"
+    }
+  ]
+}

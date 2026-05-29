@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, AtSign, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -20,7 +20,7 @@ export function LoginForm() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
       if (!res.ok) {
         const j = await res.json().catch(() => ({}));
@@ -37,26 +37,38 @@ export function LoginForm() {
 
   return (
     <form onSubmit={submit} className="mt-6 space-y-4">
-      <div>
-        <label className="mb-1 block text-xs font-medium text-slate-600">邮箱</label>
-        <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
-      </div>
-      <div>
-        <label className="mb-1 block text-xs font-medium text-slate-600">密码</label>
-        <Input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="至少 6 位" />
-      </div>
-      {err && <div className="rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-700 dark:bg-rose-950 dark:text-rose-300">{err}</div>}
-      <Button type="submit" size="lg" variant="primary" className="w-full" disabled={loading}>
-        {loading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 登录中…
-          </>
-        ) : (
-          "登录 / 注册"
-        )}
+      <Input
+        label="账号"
+        required
+        type="text"
+        autoComplete="username"
+        leftIcon={<AtSign className="h-3.5 w-3.5" />}
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="邮箱或 admin"
+        hint="邮箱或任意用户名都可以，例如 admin"
+      />
+      <Input
+        label="密码"
+        required
+        type="password"
+        autoComplete="current-password"
+        leftIcon={<KeyRound className="h-3.5 w-3.5" />}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="任意密码（首次登录即注册）"
+      />
+      {err && (
+        <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-300">
+          {err}
+        </div>
+      )}
+      <Button type="submit" size="lg" variant="primary" className="w-full" loading={loading} loadingText="登录中…">
+        登录 / 注册
       </Button>
       <p className="text-center text-xs text-slate-500">
-        密码长度 ≥ 6 位即可。首次登录会自动创建账户。
+        首次输入即自动注册。试试 <code className="rounded bg-slate-100 px-1 py-0.5 dark:bg-slate-800">admin</code> /{" "}
+        <code className="rounded bg-slate-100 px-1 py-0.5 dark:bg-slate-800">admin</code>
       </p>
     </form>
   );

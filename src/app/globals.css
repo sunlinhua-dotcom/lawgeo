@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* 暂时锁定 light 主题：把 `dark:` variant 改成 class-based，
+   除非 <html> 有 .dark 类，否则不生效。我们没加 .dark，所以等于关闭。
+   等 dark 主题完整覆盖后再切回 prefers-color-scheme。 */
+@variant dark (&:where(.dark, .dark *));
+
+
 /* ──────────────────────────────────────────────────────────────────
    Design tokens — Apple HIG inspired but tighter & more modern
    ────────────────────────────────────────────────────────────────── */
