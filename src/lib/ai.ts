@@ -62,7 +62,10 @@ export function platformPersona(p: AiPlatformId) {
 
 /**
  * 平台 → 真实 provider 映射。
- * 只有配置了对应 env key 才会启用，否则返回 null（fallback 到 MIMO 模拟）。
+ *
+ * 默认策略：**所有平台统一走小米 MIMO**（用户提供的唯一 API），不碰任何外部官方端点。
+ * 仅当显式设置 `ALLOW_EXTERNAL_PROVIDERS=true` 且配了对应官方 key 时，才会切到官方平台。
+ * 这样保证「所有 LLM 调用都只用 MIMO」，零外部依赖、零额外计费。
  */
 interface PlatformProvider {
   model: LanguageModel;
@@ -70,68 +73,43 @@ interface PlatformProvider {
   isReal: true;
 }
 
+const ALLOW_EXTERNAL = process.env.ALLOW_EXTERNAL_PROVIDERS === "true";
+
 function realProvider(p: AiPlatformId): PlatformProvider | null {
-  // Anthropic Claude
+  // 默认关闭：不配 ALLOW_EXTERNAL_PROVIDERS 就永远不碰外部端点，全部回落 MIMO。
+  if (!ALLOW_EXTERNAL) return null;
+
   if (p === "claude" && process.env.ANTHROPIC_API_KEY) {
     const anthropic = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     return { model: anthropic("claude-opus-4-5"), modelName: "claude-opus-4-5", isReal: true };
   }
-  // OpenAI ChatGPT
   if (p === "gpt" && process.env.OPENAI_API_KEY) {
     const oai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY });
     return { model: oai.chat("gpt-5"), modelName: "gpt-5", isReal: true };
   }
-  // DeepSeek (OpenAI compatible)
   if (p === "deepseek" && process.env.DEEPSEEK_API_KEY) {
-    const ds = createOpenAI({
-      apiKey: process.env.DEEPSEEK_API_KEY,
-      baseURL: "https://api.deepseek.com/v1",
-    });
+    const ds = createOpenAI({ apiKey: process.env.DEEPSEEK_API_KEY, baseURL: "https://api.deepseek.com/v1" });
     return { model: ds.chat("deepseek-chat"), modelName: "deepseek-chat", isReal: true };
   }
-  // 通义千问 (DashScope OpenAI 兼容)
   if (p === "qwen" && process.env.QWEN_API_KEY) {
-    const qwen = createOpenAI({
-      apiKey: process.env.QWEN_API_KEY,
-      baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-    });
+    const qwen = createOpenAI({ apiKey: process.env.QWEN_API_KEY, baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1" });
     return { model: qwen.chat("qwen-max"), modelName: "qwen-max", isReal: true };
   }
-  // 豆包 / 火山方舟
   if (p === "doubao" && process.env.DOUBAO_API_KEY) {
-    const doubao = createOpenAI({
-      apiKey: process.env.DOUBAO_API_KEY,
-      baseURL: "https://ark.cn-beijing.volces.com/api/v3",
-    });
+    const doubao = createOpenAI({ apiKey: process.env.DOUBAO_API_KEY, baseURL: "https://ark.cn-beijing.volces.com/api/v3" });
     return { model: doubao.chat("doubao-pro-32k"), modelName: "doubao-pro-32k", isReal: true };
   }
-  // Kimi / Moonshot
   if (p === "kimi" && process.env.KIMI_API_KEY) {
-    const kimi = createOpenAI({
-      apiKey: process.env.KIMI_API_KEY,
-      baseURL: "https://api.moonshot.cn/v1",
-    });
+    const kimi = createOpenAI({ apiKey: process.env.KIMI_API_KEY, baseURL: "https://api.moonshot.cn/v1" });
     return { model: kimi.chat("moonshot-v1-32k"), modelName: "moonshot-v1-32k", isReal: true };
   }
-  // 智谱 GLM
   if (p === "zhipu" && process.env.ZHIPU_API_KEY) {
-    const zhipu = createOpenAI({
-      apiKey: process.env.ZHIPU_API_KEY,
-      baseURL: "https://open.bigmodel.cn/api/paas/v4",
-    });
+    const zhipu = createOpenAI({ apiKey: process.env.ZHIPU_API_KEY, baseURL: "https://open.bigmodel.cn/api/paas/v4" });
     return { model: zhipu.chat("glm-4"), modelName: "glm-4", isReal: true };
   }
-  // Perplexity
   if (p === "perplexity" && process.env.PERPLEXITY_API_KEY) {
-    const ppx = createOpenAI({
-      apiKey: process.env.PERPLEXITY_API_KEY,
-      baseURL: "https://api.perplexity.ai",
-    });
-    return {
-      model: ppx.chat("llama-3.1-sonar-large-128k-online"),
-      modelName: "sonar-large-online",
-      isReal: true,
-    };
+    const ppx = createOpenAI({ apiKey: process.env.PERPLEXITY_API_KEY, baseURL: "https://api.perplexity.ai" });
+    return { model: ppx.chat("llama-3.1-sonar-large-128k-online"), modelName: "sonar-large-online", isReal: true };
   }
   return null;
 }
@@ -151,12 +129,13 @@ function gatewayProvider(p: AiPlatformId): PlatformProvider | null {
 
 export function platformStatus(
   p: AiPlatformId,
-): { mode: "real" | "gateway" | "simulated"; model: string } {
+): { mode: "real" | "gateway" | "mimo"; model: string } {
   const real = realProvider(p);
   if (real) return { mode: "real", model: real.modelName };
   const gw = gatewayProvider(p);
   if (gw) return { mode: "gateway", model: gw.modelName };
-  return { mode: "simulated", model: `mimo-as-${p}` };
+  // 默认：统一走用户的 MIMO API（带平台 persona 区分风格）
+  return { mode: "mimo", model: MIMO_MODEL };
 }
 
 /** 简易包装：传入 prompt 直接拿回答 */

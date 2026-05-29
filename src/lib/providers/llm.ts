@@ -31,25 +31,32 @@ const MIMO_MODEL = process.env.MIMO_MODEL ?? "mimo-v2.5-pro";
 
 export function getLlmConfig(): LlmGatewayConfig {
   if (GATEWAY_URL && GATEWAY_KEY) {
+    const defaultModel = process.env.LLM_GATEWAY_MODEL ?? "deepseek/deepseek-chat";
+    // 若网关指向 MIMO 或显式设了统一模型，则所有平台都映射到同一个模型（= 你的 API）。
+    const universal =
+      process.env.LLM_GATEWAY_UNIVERSAL_MODEL?.trim() ||
+      (/xiaomimimo/.test(GATEWAY_URL) ? MIMO_MODEL : "");
+    const platforms = ["deepseek", "qwen", "doubao", "yuanbao", "kimi", "zhipu", "claude", "gpt", "gemini", "perplexity"];
+    const modelMap: Record<string, string> = universal
+      ? Object.fromEntries(platforms.map((p) => [p, universal]))
+      : {
+          deepseek: "deepseek/deepseek-chat",
+          qwen: "qwen/qwen-max",
+          doubao: "doubao/doubao-pro-32k",
+          yuanbao: "hunyuan/hunyuan-pro",
+          kimi: "moonshot/moonshot-v1-32k",
+          zhipu: "zhipu/glm-4",
+          claude: "anthropic/claude-opus-4-5",
+          gpt: "openai/gpt-5",
+          gemini: "gemini/gemini-2.5-pro",
+          perplexity: "perplexity/sonar-large",
+        };
     return {
       provider: "litellm-gateway",
       baseURL: GATEWAY_URL,
       apiKey: GATEWAY_KEY,
-      // 网关侧用 model 名直接路由；这里给一个通用默认
-      defaultModel: process.env.LLM_GATEWAY_MODEL ?? "deepseek/deepseek-chat",
-      // 平台 slug → 网关 model alias（在 LiteLLM config.yaml 里配同名 alias）
-      modelMap: {
-        deepseek: "deepseek/deepseek-chat",
-        qwen: "qwen/qwen-max",
-        doubao: "doubao/doubao-pro-32k",
-        yuanbao: "hunyuan/hunyuan-pro",
-        kimi: "moonshot/moonshot-v1-32k",
-        zhipu: "zhipu/glm-4",
-        claude: "anthropic/claude-opus-4-5",
-        gpt: "openai/gpt-5",
-        gemini: "gemini/gemini-2.5-pro",
-        perplexity: "perplexity/sonar-large",
-      },
+      defaultModel: universal || defaultModel,
+      modelMap,
     };
   }
   return {

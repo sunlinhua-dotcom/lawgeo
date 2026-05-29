@@ -142,17 +142,17 @@ export default async function MonitorDashboardPage() {
                     <span className="text-sm">{p.name}</span>
                   </div>
                   <Badge
-                    variant={st.mode === "real" ? "success" : st.mode === "gateway" ? "primary" : "outline"}
+                    variant={st.mode === "real" ? "success" : st.mode === "gateway" ? "primary" : "primary"}
                     className="text-[10px]"
                   >
-                    {st.mode === "real" ? "真实接入" : st.mode === "gateway" ? "网关接入" : "MIMO 模拟"}
+                    {st.mode === "real" ? "真实接入" : st.mode === "gateway" ? "网关接入" : "MIMO 统一"}
                   </Badge>
                 </div>
               );
             })}
           </div>
           <p className="mt-4 text-xs text-slate-500">
-            在 <code className="text-indigo-600">.env.local</code> 配置对应 API key 即自动切换到真实接入。
+            当前全部平台统一走 <strong>小米 MIMO</strong> API（带 persona 区分风格）。如需切到各平台官方，设 <code className="text-indigo-600">ALLOW_EXTERNAL_PROVIDERS=true</code> 并配对应 key。
           </p>
         </CardContent>
       </Card>
