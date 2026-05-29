@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
-import { ask, type AiPlatformId } from "@/lib/ai";
+import { type AiPlatformId } from "@/lib/ai";
 import { db, schema } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { incUsage } from "@/lib/usage";
+import { getAnswerCrawler } from "@/lib/providers";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -54,18 +55,20 @@ export async function POST(req: Request) {
   }
 
   const session = await getSession();
+  const crawler = getAnswerCrawler();
 
   const tasks = platforms.map(async (platform) => {
     const t0 = Date.now();
     const prompt = DETECT_PROMPT(body.question, body.brand);
     try {
-      const r = await ask({
-        prompt,
+      // 走 answer-crawler provider：配了 BROWSER_AGENT_URL 时是真机抓取+截图，否则 LLM 模拟
+      const r = await crawler.crawlAnswer({
         platform,
-        temperature: 0.55,
+        question: prompt,
+        captureScreenshot: true,
       });
-      const cited = body.brand ? r.text.includes(body.brand) : false;
-      const rank = cited && body.brand ? estimateRank(r.text, body.brand) : null;
+      const cited = body.brand ? r.answer.includes(body.brand) : false;
+      const rank = cited && body.brand ? estimateRank(r.answer, body.brand) : null;
       const latency = Date.now() - t0;
 
       // 持久化
@@ -78,11 +81,12 @@ export async function POST(req: Request) {
           question: body.question,
           brand: body.brand ?? null,
           platform,
-          model: "mimo-v2.5-pro",
+          model: r.isReal ? `real:${platform}` : "mimo-v2.5-pro",
           prompt,
-          response: r.text.slice(0, 8000),
+          response: r.answer.slice(0, 8000),
           cited,
           rank,
+          citedUrl: r.archiveUrl ?? null,
           latencyMs: latency,
           source: body.source ?? "compare",
         });
@@ -93,9 +97,12 @@ export async function POST(req: Request) {
       return {
         platform,
         ok: true,
-        text: r.text,
+        text: r.answer,
         cited,
         rank,
+        isReal: r.isReal,
+        screenshotPath: r.screenshotPath,
+        archiveUrl: r.archiveUrl,
         latencyMs: latency,
       };
     } catch (e: unknown) {

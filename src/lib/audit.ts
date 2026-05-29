@@ -1,5 +1,6 @@
 import "server-only";
 import type { AuditCheck, AuditResult, CheckStatus } from "./audit-types";
+import { getScraper } from "./providers/scraper";
 
 const UA = "lawGEO-audit/1.0 (+https://lawgeo.cn/tools/audit)";
 const TIMEOUT_MS = 8000;
@@ -88,16 +89,19 @@ export async function runAudit(rawDomain: string): Promise<AuditResult> {
   const t0 = Date.now();
   const { domain, url } = normalizeDomain(rawDomain);
 
-  const [home, llms, llmsFull, robots, sitemap] = await Promise.all([
-    fetchText(url),
+  // 主页用 scraper provider 抓取（配了 Firecrawl 时能渲染 SPA + 拿截图）；
+  // llms.txt / robots / sitemap 是静态文本，仍用轻量 fetch。
+  const scraper = getScraper();
+  const [homePage, llms, llmsFull, robots, sitemap] = await Promise.all([
+    scraper.scrape(url, { screenshot: false, timeoutMs: TIMEOUT_MS }),
     fetchText(`${url}llms.txt`),
     fetchText(`${url}llms-full.txt`),
     fetchText(`${url}robots.txt`),
     fetchText(`${url}sitemap.xml`),
   ]);
 
-  const html = home.text;
-  const hasContent = home.ok && html.length > 200;
+  const html = homePage.html ?? "";
+  const hasContent = homePage.ok && (html.length > 200 || homePage.markdown.length > 200);
 
   // ── Meta extraction ─────────────────────────────────────────────────
   const title = html.match(/<title>([^<]+)<\/title>/i)?.[1]?.trim();
@@ -149,8 +153,10 @@ export async function runAudit(rawDomain: string): Promise<AuditResult> {
     {
       id: "https",
       label: "HTTPS 可访问",
-      status: home.ok ? "pass" : "fail",
-      detail: home.ok ? `状态 ${home.status}，可正常访问` : "无法访问，请检查域名",
+      status: homePage.ok ? "pass" : "fail",
+      detail: homePage.ok
+        ? `可正常访问（${homePage.provider === "firecrawl" ? "Firecrawl 渲染" : "直连"}）`
+        : "无法访问，请检查域名",
       weight: 5,
     },
     {

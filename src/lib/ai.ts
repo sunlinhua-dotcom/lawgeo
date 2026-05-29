@@ -2,11 +2,14 @@ import "server-only";
 import { createOpenAI, type OpenAIProvider } from "@ai-sdk/openai";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { generateText, streamText, type LanguageModel } from "ai";
+import { getLlmConfig, getLlmProvider } from "./providers/llm";
 
 /**
- * 统一 AI 客户端：
- * - 默认所有平台都用小米 MIMO（OpenAI 协议），通过 persona prompt 模拟各平台风格
- * - 如果用户在 .env 里配置了对应平台的真实 key，则切换到真实 provider
+ * 统一 AI 客户端（三级路由）：
+ *   1. 平台真实 key（ANTHROPIC_API_KEY 等）→ 直连官方
+ *   2. LiteLLM 网关（LLM_GATEWAY_URL）→ 统一 100+ 模型 + 成本追踪（按平台 alias 路由）
+ *   3. 小米 MIMO 直连（builtin 兜底）→ persona prompt 模拟各平台风格
+ * 详见 docs/oss-integration-research.md。
  */
 const MIMO_KEY = process.env.MIMO_API_KEY;
 const MIMO_BASE = process.env.MIMO_BASE_URL ?? "https://token-plan-cn.xiaomimimo.com/v1";
@@ -133,9 +136,26 @@ function realProvider(p: AiPlatformId): PlatformProvider | null {
   return null;
 }
 
-export function platformStatus(p: AiPlatformId): { mode: "real" | "simulated"; model: string } {
+/**
+ * LiteLLM 网关 provider（中间层）。
+ * 仅当 LLM_GATEWAY_URL 配置、且该平台在网关 modelMap 里时启用。
+ */
+function gatewayProvider(p: AiPlatformId): PlatformProvider | null {
+  const cfg = getLlmConfig();
+  if (cfg.provider !== "litellm-gateway") return null;
+  const alias = cfg.modelMap[p];
+  if (!alias) return null;
+  const provider = getLlmProvider();
+  return { model: provider.chat(alias), modelName: alias, isReal: true };
+}
+
+export function platformStatus(
+  p: AiPlatformId,
+): { mode: "real" | "gateway" | "simulated"; model: string } {
   const real = realProvider(p);
   if (real) return { mode: "real", model: real.modelName };
+  const gw = gatewayProvider(p);
+  if (gw) return { mode: "gateway", model: gw.modelName };
   return { mode: "simulated", model: `mimo-as-${p}` };
 }
 
@@ -147,10 +167,15 @@ export async function ask(opts: {
   temperature?: number;
 }) {
   const persona = opts.platform ? platformPersona(opts.platform) : "";
+  // 三级路由：平台真实 key → LiteLLM 网关 alias → MIMO 模拟
   const real = opts.platform ? realProvider(opts.platform) : null;
-  const model = real?.model ?? defaultModel;
-  // 真实 provider 不需要 persona 提示
-  const system = real ? (opts.system ?? undefined) : [persona, opts.system].filter(Boolean).join("\n\n") || undefined;
+  const gw = !real && opts.platform ? gatewayProvider(opts.platform) : null;
+  const chosen = real ?? gw;
+  const model = chosen?.model ?? defaultModel;
+  // 真实/网关 provider 用真模型，不需要 persona 模拟提示
+  const system = chosen
+    ? (opts.system ?? undefined)
+    : [persona, opts.system].filter(Boolean).join("\n\n") || undefined;
 
   const t0 = Date.now();
   const result = await generateText({
@@ -163,8 +188,9 @@ export async function ask(opts: {
     text: result.text,
     usage: result.usage,
     latencyMs: Date.now() - t0,
-    modelUsed: real?.modelName ?? MIMO_MODEL,
+    modelUsed: chosen?.modelName ?? MIMO_MODEL,
     isReal: !!real,
+    viaGateway: !!gw,
   };
 }
 

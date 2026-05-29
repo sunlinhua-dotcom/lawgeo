@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { CitationTrendChart, PlatformBarChart } from "@/components/dashboard/trend-chart";
+import { ProvidersStatus } from "@/components/dashboard/providers-status";
 import { Bot, ArrowRight, Play } from "lucide-react";
 import { siteConfig } from "@/lib/site";
 import { platformStatus, type AiPlatformId } from "@/lib/ai";
@@ -140,8 +141,11 @@ export default async function MonitorDashboardPage() {
                     <Bot className="h-3.5 w-3.5 text-indigo-500" />
                     <span className="text-sm">{p.name}</span>
                   </div>
-                  <Badge variant={st.mode === "real" ? "success" : "outline"} className="text-[10px]">
-                    {st.mode === "real" ? "真实接入" : "MIMO 模拟"}
+                  <Badge
+                    variant={st.mode === "real" ? "success" : st.mode === "gateway" ? "primary" : "outline"}
+                    className="text-[10px]"
+                  >
+                    {st.mode === "real" ? "真实接入" : st.mode === "gateway" ? "网关接入" : "MIMO 模拟"}
                   </Badge>
                 </div>
               );
@@ -152,6 +156,10 @@ export default async function MonitorDashboardPage() {
           </p>
         </CardContent>
       </Card>
+
+      <div className="mt-6">
+        <ProvidersStatus />
+      </div>
     </div>
   );
 }
