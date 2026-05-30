@@ -67,19 +67,57 @@ export function ContentWizard({
   const [generating, setGenerating] = useState(false);
   const [content, setContent] = useState("");
   const [scores, setScores] = useState<Scores | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+
+  /** 计时器：AI 调用期间每秒 +1，给用户「在跑」的反馈 */
+  function startTimer() {
+    setElapsed(0);
+    const t = setInterval(() => setElapsed((e) => e + 1), 1000);
+    return () => clearInterval(t);
+  }
+
+  /** 不等 AI 的即时模板标题（秒出） */
+  function templateTitles() {
+    if (!intent.trim()) return;
+    const i = intent.trim();
+    setTitles([
+      `${i}？${brandName}专业解答（2026 最新）`,
+      `${brandName}：关于「${i}」你该知道的 5 件事`,
+      `${i}怎么办？一篇讲清流程、费用与注意事项`,
+      `${i} | ${brandName}实务指南`,
+      `${i}？看完这篇就懂了`,
+    ]);
+    if (!title) setTitle(`${i}？${brandName}专业解答（2026 最新）`);
+    toast.success("已生成模板标题，可直接选用或点「AI 生成标题」要更优的");
+  }
 
   async function generateTitles() {
     if (!intent.trim()) return;
     setGenTitles(true);
+    const stop = startTimer();
+    const ctl = new AbortController();
+    const timeout = setTimeout(() => ctl.abort(), 90000);
     try {
       const r = await fetch("/api/content/titles", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ intent, brandName }),
+        signal: ctl.signal,
       }).then((x) => x.json());
-      setTitles(r.titles ?? []);
-      if (r.titles?.[0]) setTitle(r.titles[0]);
+      if (r.titles?.length) {
+        setTitles(r.titles);
+        if (!title) setTitle(r.titles[0]);
+        toast.success("AI 标题已生成");
+      } else {
+        throw new Error(r.error || "未返回标题");
+      }
+    } catch (e) {
+      const aborted = e instanceof Error && e.name === "AbortError";
+      toast.error(aborted ? "AI 较慢超时了，先用模板标题吧" : "AI 标题失败，用模板标题");
+      templateTitles();
     } finally {
+      clearTimeout(timeout);
+      stop();
       setGenTitles(false);
     }
   }
@@ -88,11 +126,15 @@ export function ContentWizard({
     setGenerating(true);
     setContent("");
     setScores(null);
+    const stop = startTimer();
+    const ctl = new AbortController();
+    const timeout = setTimeout(() => ctl.abort(), 150000);
     try {
       const r = await fetch("/api/content/generate-scored", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ title, intent, intentId, keywords: intent ? [intent] : [] }),
+        signal: ctl.signal,
       });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error);
@@ -101,8 +143,11 @@ export function ContentWizard({
       setStep(2);
       toast.success(`生成完成，GEO 总分 ${d.scores.total}`);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "生成失败");
+      const aborted = e instanceof Error && e.name === "AbortError";
+      toast.error(aborted ? "生成超时（MIMO 较慢），请重试" : e instanceof Error ? e.message : "生成失败");
     } finally {
+      clearTimeout(timeout);
+      stop();
       setGenerating(false);
     }
   }
@@ -156,11 +201,22 @@ export function ContentWizard({
               <div>
                 <div className="mb-1.5 flex items-center justify-between">
                   <span className="text-xs font-medium text-slate-700 dark:text-slate-300">标题</span>
-                  <Button size="xs" variant="ghost" onClick={generateTitles} disabled={genTitles || !intent.trim()}>
-                    {genTitles ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
-                    <span className="ml-1">AI 生成标题</span>
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button size="xs" variant="ghost" onClick={templateTitles} disabled={!intent.trim() || genTitles}>
+                      <FileText className="h-3 w-3" />
+                      <span className="ml-1">模板标题（秒出）</span>
+                    </Button>
+                    <Button size="xs" variant="ghost" onClick={generateTitles} disabled={genTitles || !intent.trim()}>
+                      {genTitles ? <Loader2 className="h-3 w-3 animate-spin" /> : <Wand2 className="h-3 w-3" />}
+                      <span className="ml-1">{genTitles ? `AI 生成中 ${elapsed}s…` : "AI 生成标题"}</span>
+                    </Button>
+                  </div>
                 </div>
+                {genTitles && (
+                  <div className="mb-2 rounded-lg bg-indigo-50 px-3 py-1.5 text-[11px] text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
+                    MIMO 生成中（通常 15-25 秒），请稍候… 已等 {elapsed}s。急的话点「模板标题」秒出。
+                  </div>
+                )}
                 {titles.length > 0 && (
                   <div className="mb-2 space-y-1">
                     {titles.map((t) => (
@@ -192,8 +248,14 @@ export function ContentWizard({
                     点下方「生成并评分」：AI 写正文 + 注入品牌知识库 + 7 维 GEO 评分。约 30-60 秒。
                   </p>
                   {generating && (
-                    <div className="mt-4 flex items-center justify-center gap-2 text-sm text-indigo-600">
-                      <Loader2 className="h-4 w-4 animate-spin" /> 生成 + 评分中…
+                    <div className="mt-4">
+                      <div className="flex items-center justify-center gap-2 text-sm text-indigo-600">
+                        <Loader2 className="h-4 w-4 animate-spin" /> 生成 + 评分中… 已等 {elapsed}s
+                      </div>
+                      <div className="mx-auto mt-3 h-1.5 max-w-xs overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                        <div className="h-full animate-pulse bg-gradient-to-r from-indigo-500 to-violet-500" style={{ width: `${Math.min(95, elapsed * 1.6)}%` }} />
+                      </div>
+                      <p className="mt-2 text-[11px] text-slate-400">MIMO 写正文约 40-70 秒，评分再 +15 秒，请耐心等。不要离开本页。</p>
                     </div>
                   )}
                 </CardContent>
@@ -209,6 +271,7 @@ export function ContentWizard({
                       <CardTitle className="text-base">
                         GEO 总分 <span className="num text-2xl text-indigo-600">{scores.total}</span>
                       </CardTitle>
+                      <p className="text-[10px] text-slate-400">由 MIMO 按 7 维 GEO rubric 对生成的正文实时打分（0-100），非随机。</p>
                     </CardHeader>
                     <CardContent>
                       <ResponsiveContainer width="100%" height={200}>
