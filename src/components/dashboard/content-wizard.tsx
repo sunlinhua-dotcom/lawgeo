@@ -9,7 +9,7 @@ import {
   Radar,
   PolarRadiusAxis,
 } from "recharts";
-import { Sparkles, Loader2, Wand2, FileText, Copy, ArrowRight, Target } from "lucide-react";
+import { Sparkles, Loader2, Wand2, FileText, Copy, ArrowRight, Target, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
@@ -159,15 +159,13 @@ export function ContentWizard({
           <StepFlow
             steps={[
               { id: "intent", title: "选意图 + 标题", canProceed: () => (!title.trim() ? "请先选/写一个标题" : true) },
-              { id: "gen", title: "生成 + 7 维评分" },
+              { id: "gen", title: "生成 + 7 维评分", canProceed: () => (!content ? "请先点上方「✨ 生成并评分」按钮" : true) },
               { id: "done", title: "结果" },
             ]}
             current={step}
             onCurrentChange={setStep}
-            onFinish={() => {
-              if (step === 1) generate();
-            }}
-            finishLabel={step === 1 ? "生成并评分" : "完成"}
+            onFinish={() => {}}
+            finishLabel="完成"
             busy={generating}
           >
             {/* step 1 */}
@@ -244,18 +242,39 @@ export function ContentWizard({
                   <Sparkles className="mx-auto h-8 w-8 text-indigo-600" />
                   <div className="mt-3 text-sm font-medium">{title}</div>
                   <div className="mt-1 text-xs text-slate-500">意图：{intent || "—"}</div>
-                  <p className="mt-4 text-xs text-slate-500">
-                    点下方「生成并评分」：AI 写正文 + 注入品牌知识库 + 7 维 GEO 评分。约 30-60 秒。
-                  </p>
+
+                  {!generating && !content && (
+                    <>
+                      <p className="mt-4 text-xs text-slate-500">
+                        点下方按钮：AI 写正文 + 注入品牌知识库 + 7 维 GEO 评分。约 40-70 秒，请勿离开本页。
+                      </p>
+                      <Button onClick={generate} variant="primary" size="lg" className="mt-4">
+                        <Sparkles className="mr-2 h-4 w-4" /> 生成并评分
+                      </Button>
+                    </>
+                  )}
+
                   {generating && (
                     <div className="mt-4">
                       <div className="flex items-center justify-center gap-2 text-sm text-indigo-600">
                         <Loader2 className="h-4 w-4 animate-spin" /> 生成 + 评分中… 已等 {elapsed}s
                       </div>
-                      <div className="mx-auto mt-3 h-1.5 max-w-xs overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                        <div className="h-full animate-pulse bg-gradient-to-r from-indigo-500 to-violet-500" style={{ width: `${Math.min(95, elapsed * 1.6)}%` }} />
+                      <div className="mx-auto mt-3 h-2 max-w-xs overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                        <div
+                          className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-1000"
+                          style={{ width: `${Math.min(95, elapsed * 1.4)}%` }}
+                        />
                       </div>
-                      <p className="mt-2 text-[11px] text-slate-400">MIMO 写正文约 40-70 秒，评分再 +15 秒，请耐心等。不要离开本页。</p>
+                      <p className="mt-2 text-[11px] text-slate-400">MIMO 写正文约 40-70 秒，评分再 +15 秒，请耐心等。</p>
+                    </div>
+                  )}
+
+                  {!generating && content && (
+                    <div className="mt-4">
+                      <Badge variant="success">
+                        <CheckCircle2 className="mr-1 h-3 w-3" /> 已生成，GEO 总分 {scores?.total}
+                      </Badge>
+                      <p className="mt-2 text-xs text-slate-500">点右下角「下一步」看完整正文 + 雷达评分。</p>
                     </div>
                   )}
                 </CardContent>
