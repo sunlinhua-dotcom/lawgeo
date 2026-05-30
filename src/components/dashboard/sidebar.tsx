@@ -19,10 +19,17 @@ import {
   Workflow,
   Plug,
   FileText,
+  Lightbulb,
+  Target,
+  PenTool,
+  Zap,
+  Activity,
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { BrandSwitcher } from "./brand-switcher";
+import type { Brand } from "@/lib/db/schema";
 
 const ICONS: Record<string, LucideIcon> = {
   LayoutDashboard,
@@ -42,6 +49,11 @@ const ICONS: Record<string, LucideIcon> = {
   Workflow,
   Plug,
   FileText,
+  Lightbulb,
+  Target,
+  PenTool,
+  Zap,
+  Activity,
 };
 
 export interface NavGroup {
@@ -54,11 +66,29 @@ export interface NavGroup {
   }>;
 }
 
-export function DashSidebar({ email, groups }: { email: string; groups: NavGroup[] }) {
+export function DashSidebar({
+  email,
+  groups,
+  brands,
+  currentBrandId,
+}: {
+  email: string;
+  groups: NavGroup[];
+  brands?: Brand[];
+  currentBrandId?: string | null;
+}) {
   const pathname = usePathname();
 
   return (
     <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] flex-col gap-1 border-r border-slate-200/60 bg-white/40 px-3 py-6 backdrop-blur-xl lg:flex dark:border-slate-800/60 dark:bg-slate-950/40">
+      {brands && (
+        <div className="mb-4">
+          <div className="mb-1.5 px-2 text-[10px] font-medium uppercase tracking-wider text-slate-400">
+            当前品牌
+          </div>
+          <BrandSwitcher brands={brands} currentBrandId={currentBrandId ?? null} />
+        </div>
+      )}
       <div className="mb-2 px-2 text-[10px] font-medium uppercase tracking-wider text-slate-400">
         控制台
       </div>

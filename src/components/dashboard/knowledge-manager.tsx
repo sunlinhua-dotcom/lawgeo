@@ -11,7 +11,30 @@ import type { KnowledgeDoc } from "@/lib/db/schema";
 export function KnowledgeManager({ initialDocs }: { initialDocs: KnowledgeDoc[] }) {
   const router = useRouter();
   const [docs, setDocs] = useState(initialDocs);
-  const [tab, setTab] = useState<"paste" | "upload">("paste");
+  const [tab, setTab] = useState<"paste" | "upload" | "qa">("paste");
+  const [qaTitle, setQaTitle] = useState("");
+  const [qaRaw, setQaRaw] = useState("");
+  const [qaBusy, setQaBusy] = useState(false);
+  async function submitQa() {
+    if (qaRaw.trim().length < 5) return;
+    setQaBusy(true);
+    try {
+      const res = await fetch("/api/knowledge/qa-import", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ title: qaTitle, raw: qaRaw }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error);
+      setQaRaw("");
+      setQaTitle("");
+      router.refresh();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "导入失败");
+    } finally {
+      setQaBusy(false);
+    }
+  }
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -136,10 +159,35 @@ export function KnowledgeManager({ initialDocs }: { initialDocs: KnowledgeDoc[] 
             >
               上传文件（.txt / .md）
             </button>
+            <button
+              onClick={() => setTab("qa")}
+              className={`rounded-md px-3 py-1 text-xs ${
+                tab === "qa" ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900" : "border border-slate-200 dark:border-slate-700"
+              }`}
+            >
+              QA 批量导入
+            </button>
           </div>
         </CardHeader>
         <CardContent>
-          {tab === "paste" ? (
+          {tab === "qa" ? (
+            <div className="space-y-3">
+              <Input value={qaTitle} onChange={(e) => setQaTitle(e.target.value)} placeholder="文档标题，如「常见问答 FAQ」" />
+              <Textarea
+                rows={10}
+                value={qaRaw}
+                onChange={(e) => setQaRaw(e.target.value)}
+                placeholder={"从 Excel/CSV 复制粘贴，每行「问题 [Tab或逗号] 答案」：\n离婚律师怎么收费\t一般按标的额 5-10% 风险代理\n抚养权怎么判\t2岁内一般归母亲，8岁以上看孩子意愿"}
+                className="font-mono text-sm"
+              />
+              <div className="flex items-center justify-between">
+                <div className="text-xs text-slate-500">用 Tab 或逗号分隔问/答，每行一条</div>
+                <Button onClick={submitQa} disabled={qaBusy || qaRaw.trim().length < 5} variant="primary">
+                  {qaBusy ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}导入问答
+                </Button>
+              </div>
+            </div>
+          ) : tab === "paste" ? (
             <div className="space-y-3">
               <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="文档标题，如「律所收费说明 v2」" />
               <Textarea

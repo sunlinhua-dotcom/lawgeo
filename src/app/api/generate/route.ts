@@ -5,6 +5,7 @@ import { buildPrompt, extractJsonLd, type ContentFormat, type Locale } from "@/l
 import { db, schema } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { incUsage, checkQuota } from "@/lib/usage";
+import { consumeTokens } from "@/lib/tokens";
 import { retrieve, buildContext } from "@/lib/rag";
 
 export const runtime = "nodejs";
@@ -92,6 +93,7 @@ export async function POST(req: Request) {
           model: "mimo-v2.5-pro",
         });
         await incUsage(session.userId, "generations", 1);
+        await consumeTokens(session.userId, Math.ceil((parts.content?.length ?? 0) / 2) + 300, "generate", body.topic);
       } catch (e) {
         console.warn("[generate] persist failed:", e);
       }

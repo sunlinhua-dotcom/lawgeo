@@ -548,3 +548,203 @@ export type PublishCredential = typeof publishCredentials.$inferSelect;
 export type Author = typeof authors.$inferSelect;
 export type BlogPost = typeof blogPosts.$inferSelect;
 export type BulkJob = typeof bulkJobs.$inferSelect;
+
+// ════════════════════════════════════════════════════════════════════
+//  GEO 核心模块（对标 AceFlow，轻量品牌上下文，无多租户分销）
+// ════════════════════════════════════════════════════════════════════
+
+// ── 品牌（GEO 模块的操作单元，用户级） ───────────────────────────
+export const brands = sqliteTable(
+  "brands",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    website: text("website"),
+    industry: text("industry"),
+    region: text("region"),
+    description: text("description"),
+    createdAt: integer("created_at", { mode: "timestamp" })
+      .notNull()
+      .default(sql`(unixepoch())`),
+  },
+  (t) => [index("brands_user_idx").on(t.userId)],
+);
+
+// ── 转化画像（品牌的转化目标，供实时查询追问命中匹配） ───────────
+export const brandConversionProfiles = sqliteTable("brand_conversion_profiles", {
+  id: text("id").primaryKey(),
+  brandId: text("brand_id")
+    .notNull()
+    .references(() => brands.id, { onDelete: "cascade" })
+    .unique(),
+  phone: text("phone"),
+  wechat: text("wechat"),
+  ctaText: text("cta_text"),
+  /** 命中视为转化的目标词（JSON array：电话/微信/官网等） */
+  conversionTargets: text("conversion_targets"),
+  followupQuestion: text("followup_question").default("联系方式是什么？"),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .default(sql`(unixepoch())`),
+});
+
+// ── 洞察任务 + 报告 ──────────────────────────────────────────────
+export const insights = sqliteTable(
+  "insights",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    brandId: text("brand_id").references(() => brands.id, { onDelete: "set null" }),
+    brandName: text("brand_name").notNull(),
+    industry: text("industry"),
+    website: text("website"),
+    keywords: text("keywords"), // JSON array 种子词
+    status: text("status", { enum: ["queued", "running", "done", "failed"] }).notNull().default("queued"),
+    progress: integer("progress").notNull().default(0),
+    /** 报告 JSON：{ websiteProfile, competitors[], sources[], heatKeywords[], brandIssues[] } */
+    report: text("report"),
+    error: text("error"),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+    finishedAt: integer("finished_at", { mode: "timestamp" }),
+  },
+  (t) => [index("insights_user_idx").on(t.userId), index("insights_brand_idx").on(t.brandId)],
+);
+
+// ── 意图词库 ──────────────────────────────────────────────────────
+export const intents = sqliteTable(
+  "intents",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    brandId: text("brand_id").references(() => brands.id, { onDelete: "cascade" }),
+    text: text("text").notNull(),
+    intentType: text("intent_type", {
+      enum: ["informational", "commercial", "transactional", "navigational"],
+    }).default("commercial"),
+    searchVolume: integer("search_volume"),
+    /** GEO 热度等级：高热度/中高热度/中等热度/长尾热度 */
+    heatLevel: text("heat_level"),
+    /** GEO 指数 0-100：该词在 AI 搜索里被触发的概率 */
+    geoIndex: integer("geo_index"),
+    priority: integer("priority").notNull().default(5),
+    note: text("note"),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+  },
+  (t) => [
+    index("intents_user_idx").on(t.userId),
+    index("intents_brand_idx").on(t.brandId),
+    uniqueIndex("intents_brand_text").on(t.brandId, t.text),
+  ],
+);
+
+// ── 内容计划 + 文章（含 7 维评分） ───────────────────────────────
+export const contentArticles = sqliteTable(
+  "content_articles",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    brandId: text("brand_id").references(() => brands.id, { onDelete: "set null" }),
+    intentId: text("intent_id").references(() => intents.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    intentText: text("intent_text"),
+    keywords: text("keywords"), // JSON array
+    body: text("body").notNull(),
+    /** 7 维评分 JSON：{ total, title, firstPara, deAi, structure, authority, match, conversion, reasons{} } */
+    scores: text("scores"),
+    targetPlatform: text("target_platform"),
+    status: text("status", { enum: ["draft", "scored", "published"] }).notNull().default("draft"),
+    model: text("model"),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+  },
+  (t) => [index("articles_user_idx").on(t.userId), index("articles_brand_idx").on(t.brandId)],
+);
+
+// ── 实时查询（主） ───────────────────────────────────────────────
+export const realtimeSearches = sqliteTable(
+  "realtime_searches",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    brandId: text("brand_id").references(() => brands.id, { onDelete: "set null" }),
+    question: text("question").notNull(),
+    targetWord: text("target_word").notNull(),
+    platforms: text("platforms").notNull(), // JSON array
+    followupTriggerWord: text("followup_trigger_word"),
+    status: text("status", { enum: ["running", "done", "failed"] }).notNull().default("running"),
+    /** 聚合：mentioned/top1/top3/converted 计数 */
+    summary: text("summary"),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+  },
+  (t) => [index("rts_user_idx").on(t.userId), index("rts_brand_idx").on(t.brandId)],
+);
+
+// ── 实时查询结果（每平台一行，含追问转化） ───────────────────────
+export const realtimeResults = sqliteTable(
+  "realtime_results",
+  {
+    id: text("id").primaryKey(),
+    searchId: text("search_id").notNull().references(() => realtimeSearches.id, { onDelete: "cascade" }),
+    platform: text("platform").notNull(),
+    answer: text("answer"),
+    isMentioned: integer("is_mentioned", { mode: "boolean" }).default(false),
+    isTop1: integer("is_top1", { mode: "boolean" }).default(false),
+    isTop3: integer("is_top3", { mode: "boolean" }).default(false),
+    rank: integer("rank"),
+    sentiment: text("sentiment"), // positive/neutral/negative
+    keywords: text("keywords"), // JSON array
+    screenshotPath: text("screenshot_path"),
+    archiveUrl: text("archive_url"),
+    isReal: integer("is_real", { mode: "boolean" }).default(false),
+    // 追问转化
+    followupTriggered: integer("followup_triggered", { mode: "boolean" }).default(false),
+    followupQuestion: text("followup_question"),
+    followupAnswer: text("followup_answer"),
+    isConverted: integer("is_converted", { mode: "boolean" }).default(false),
+    conversionStatus: text("conversion_status"), // followup_hit / none
+    matchedTargets: text("matched_targets"), // JSON array
+    latencyMs: integer("latency_ms"),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+  },
+  (t) => [index("rtr_search_idx").on(t.searchId), index("rtr_platform_idx").on(t.platform)],
+);
+
+// ── Token 钱包 + 流水（计费计量） ────────────────────────────────
+export const tokenWallets = sqliteTable("token_wallets", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }).unique(),
+  /** 余额（token 数；演示按 1 元 = 1000 token） */
+  balance: integer("balance").notNull().default(1000000),
+  totalRecharged: integer("total_recharged").notNull().default(1000000),
+  totalConsumed: integer("total_consumed").notNull().default(0),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+});
+
+export const tokenLedgers = sqliteTable(
+  "token_ledgers",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    /** 正=充值，负=消耗 */
+    amount: integer("amount").notNull(),
+    balanceAfter: integer("balance_after").notNull(),
+    type: text("type", { enum: ["recharge", "consume"] }).notNull(),
+    /** 来源功能：realtime/generate/insight/intent/compare... */
+    source: text("source"),
+    note: text("note"),
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+  },
+  (t) => [index("ledger_user_idx").on(t.userId), index("ledger_date_idx").on(t.createdAt)],
+);
+
+export type Brand = typeof brands.$inferSelect;
+export type BrandConversionProfile = typeof brandConversionProfiles.$inferSelect;
+export type Insight = typeof insights.$inferSelect;
+export type Intent = typeof intents.$inferSelect;
+export type ContentArticle = typeof contentArticles.$inferSelect;
+export type RealtimeSearch = typeof realtimeSearches.$inferSelect;
+export type RealtimeResult = typeof realtimeResults.$inferSelect;
+export type TokenWallet = typeof tokenWallets.$inferSelect;
+export type TokenLedger = typeof tokenLedgers.$inferSelect;

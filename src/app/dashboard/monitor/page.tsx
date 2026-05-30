@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { CitationTrendChart, PlatformBarChart } from "@/components/dashboard/trend-chart";
+import { BrandRadarChart, SentimentPie, ConversionFunnel } from "@/components/dashboard/brand-radar";
 import { ProvidersStatus } from "@/components/dashboard/providers-status";
 import { Bot, ArrowRight, Play } from "lucide-react";
 import { siteConfig } from "@/lib/site";
@@ -58,6 +59,40 @@ export default async function MonitorDashboardPage() {
   const cited = queries.filter((q) => q.cited).length;
   const top1 = queries.filter((q) => q.rank === 1).length;
 
+  // ── 品牌雷达 + 情绪 + 转化漏斗（来自 realtime_results） ──────────
+  const rtResults = await db
+    .select()
+    .from(schema.realtimeResults)
+    .leftJoin(schema.realtimeSearches, eq(schema.realtimeResults.searchId, schema.realtimeSearches.id))
+    .where(eq(schema.realtimeSearches.userId, session.userId))
+    .limit(2000);
+  const rr = rtResults.map((row) => row.realtime_results);
+  const rtTotal = rr.length;
+  const rtMentioned = rr.filter((r) => r.isMentioned).length;
+  const rtTop3 = rr.filter((r) => r.isTop3).length;
+  const rtFollowup = rr.filter((r) => r.followupTriggered).length;
+  const rtConverted = rr.filter((r) => r.isConverted).length;
+  const sentiment = {
+    positive: rr.filter((r) => r.sentiment === "positive").length,
+    neutral: rr.filter((r) => r.sentiment === "neutral").length,
+    negative: rr.filter((r) => r.sentiment === "negative").length,
+  };
+  const radarData = [
+    { dim: "可见度", value: rtTotal ? Math.round((rtMentioned / rtTotal) * 100) : 0 },
+    { dim: "推荐度", value: rtTotal ? Math.round((rtTop3 / rtTotal) * 100) : 0 },
+    { dim: "Top1", value: rtTotal ? Math.round((rr.filter((r) => r.isTop1).length / rtTotal) * 100) : 0 },
+    { dim: "正面情绪", value: rtMentioned ? Math.round((sentiment.positive / rtMentioned) * 100) : 0 },
+    { dim: "转化力", value: rtFollowup ? Math.round((rtConverted / rtFollowup) * 100) : 0 },
+  ];
+  const funnelData = [
+    { stage: "曝光", value: rtTotal },
+    { stage: "提及", value: rtMentioned },
+    { stage: "Top3", value: rtTop3 },
+    { stage: "追问", value: rtFollowup },
+    { stage: "转化命中", value: rtConverted },
+  ];
+  const hasRealtimeData = rtTotal > 0;
+
   return (
     <div className="px-6 py-8 lg:px-10">
       <div className="mb-6 flex items-center justify-between">
@@ -71,6 +106,24 @@ export default async function MonitorDashboardPage() {
           </Link>
         </Button>
       </div>
+
+      {/* 品牌雷达 + 情绪 + 转化漏斗 */}
+      {hasRealtimeData && (
+        <div className="mb-6 grid gap-4 lg:grid-cols-3">
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-base">📡 品牌雷达</CardTitle></CardHeader>
+            <CardContent><BrandRadarChart data={radarData} /></CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-base">😊 情绪分布</CardTitle></CardHeader>
+            <CardContent><SentimentPie data={sentiment} /></CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-base">🎯 转化漏斗</CardTitle></CardHeader>
+            <CardContent><ConversionFunnel data={funnelData} /></CardContent>
+          </Card>
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-4 mb-6">
         <Card>

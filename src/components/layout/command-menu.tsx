@@ -32,6 +32,10 @@ import {
   Landmark,
   Globe,
   Scale,
+  Lightbulb,
+  PenTool,
+  Zap,
+  Activity,
   type LucideIcon,
 } from "lucide-react";
 
@@ -44,9 +48,17 @@ interface CmdItem {
 }
 
 const items: CmdItem[] = [
+  // GEO 全链路
+  { title: "洞察与诊断", href: "/dashboard/insight", icon: Lightbulb, group: "GEO 全链路" },
+  { title: "定位搜索意图", href: "/dashboard/intent", icon: Target, group: "GEO 全链路" },
+  { title: "内容创作及发布（7维评分）", href: "/dashboard/content", icon: PenTool, group: "GEO 全链路" },
+  { title: "实时查询（追问转化）", href: "/dashboard/realtime", icon: Zap, group: "GEO 全链路" },
+  { title: "数据监测追踪", href: "/dashboard/monitor", icon: Activity, group: "GEO 全链路" },
+  { title: "AI 品牌资产", href: "/dashboard/brand-assets", icon: Sparkles, group: "GEO 全链路" },
+
   // 控制台
   { title: "控制台 · 概览", href: "/dashboard", icon: LayoutDashboard, group: "控制台" },
-  { title: "项目管理", href: "/dashboard/projects", icon: Building2, group: "控制台" },
+  { title: "Token / 计费", href: "/dashboard/billing", icon: CreditCard, group: "控制台" },
   { title: "诊断历史", href: "/dashboard/audits", icon: Search, group: "控制台" },
   { title: "AI 内容生成", href: "/dashboard/generate", icon: Sparkles, group: "控制台" },
   { title: "AI 引用监测", href: "/dashboard/monitor", icon: Bot, group: "控制台" },

@@ -2,17 +2,20 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { getUserPlan, PLAN_LIMITS, yearMonth } from "@/lib/usage";
+import { getWallet, listLedgers } from "@/lib/tokens";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, Sparkles } from "lucide-react";
+import { TokenPanel } from "@/components/dashboard/token-panel";
 
-export const metadata = { title: "套餐 / 用量", robots: { index: false } };
+export const metadata = { title: "套餐 / Token", robots: { index: false } };
 
 export default async function BillingPage() {
   const session = await getSession();
   if (!session) redirect("/login");
   const plan = await getUserPlan(session.userId);
+  const [wallet, ledgers] = await Promise.all([getWallet(session.userId), listLedgers(session.userId, 50)]);
   const limits = plan.limits;
   const usage = plan.usage;
   const pct = (used: number, cap: number) => Math.min(100, Math.round((used / cap) * 100));
@@ -20,8 +23,13 @@ export default async function BillingPage() {
   return (
     <div className="px-6 py-8 lg:px-10">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold">套餐 / 用量</h1>
+        <h1 className="text-2xl font-semibold">套餐 / Token</h1>
         <p className="mt-1 text-sm text-slate-500">本月：{yearMonth()}</p>
+      </div>
+
+      {/* Token 钱包 */}
+      <div className="mb-6">
+        <TokenPanel wallet={wallet} ledgers={ledgers} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
