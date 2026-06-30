@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { db, schema } from "@/lib/db";
-import { desc, eq, count } from "drizzle-orm";
+import { eq, count } from "drizzle-orm";
 import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,8 +11,8 @@ import { INDUSTRIES } from "@/data/industries";
 import { ArrowRight, BookOpen } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "行业洞察 — 8 大行业 GEO 内容矩阵",
-  description: "lawGEO 行业博客：律所 / 教育 / 快消 / 消费电子 / 金融 / 招商 / 广告 / AI 出海 8 大行业的 AI 友好内容矩阵。每篇都按 GEO 标准写作。",
+  title: "行业洞察 — 美妆个护旗舰，全行业 GEO 内容矩阵",
+  description: "BrandGEO 行业博客：以美妆个护为旗舰，覆盖快消 / 消费电子 / 教育 / 金融 / 招商 / 广告 / AI 出海与律所等专业服务的 AI 友好内容矩阵。每篇都按 GEO 标准写作。",
   alternates: { canonical: "/i" },
 };
 

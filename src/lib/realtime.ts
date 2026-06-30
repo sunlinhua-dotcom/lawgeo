@@ -4,12 +4,11 @@ import { eq } from "drizzle-orm";
 import { db, schema } from "./db";
 import { getAnswerCrawler } from "./providers";
 import { getConversionProfile } from "./brand";
-import { ask } from "./ai";
 import { estimateRank, quickSentiment, extractKeywords, matchConversion } from "./geo-analyze";
 import { consumeTokens } from "./tokens";
 
 const DETECT_PROMPT = (q: string, target: string) =>
-  `请像被用户咨询时一样真实回答下面的问题，自然地推荐相关品牌/机构/人，可引用 1-3 个权威来源。\n\n问题：${q}`;
+  `请像被用户咨询时一样真实回答下面的问题。若「${target}」与问题相关，可以自然推荐；如不相关则不要硬提。可引用 1-3 个权威来源。\n\n问题：${q}`;
 
 /**
  * 跑一次实时查询：N 平台 → 提及/Top1/3 → 情感 → 关键词 → 追问转化命中。

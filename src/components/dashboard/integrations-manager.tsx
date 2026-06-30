@@ -70,7 +70,7 @@ export function IntegrationsManager({ initialCreds }: { initialCreds: Cred[] }) 
     <div className="space-y-6">
       <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">
         <ShieldCheck className="mr-1 inline h-4 w-4" />
-        Token 仅存储在你自己的数据库（本地 SQLite）。lawGEO 服务端不会上传或外传你的 token。生产环境建议在 .env 配置加密密钥后启用列加密。
+        Token 仅存储在你自己的数据库（本地 SQLite）。BrandGEO 服务端不会上传或外传你的 token。生产环境建议在 .env 配置加密密钥后启用列加密。
       </div>
 
       <div className="grid gap-4">
@@ -117,7 +117,7 @@ const GITHUB_TOOLS = [
     install: "https://chromewebstore.google.com/detail/onpoadmkhcefogpdneghihaegkilfcgg",
     license: "GPL-3.0",
     type: "Chrome 扩展 + MCP Server",
-    desc: "29+ 中文平台一键同步：公众号 / 知乎 / 头条 / 百家号 / CSDN / 简书 / 掘金 / SegmentFault / 小红书 / WordPress / typecho。集成方式：网页注入 window.syncPost() — lawGEO 已对接 ✓",
+    desc: "29+ 中文平台一键同步：公众号 / 知乎 / 头条 / 百家号 / CSDN / 简书 / 掘金 / SegmentFault / 小红书 / WordPress / typecho。集成方式：网页注入 window.syncPost() — BrandGEO 已对接 ✓",
     platforms: "29+",
     integrated: true,
     badge: "已对接",

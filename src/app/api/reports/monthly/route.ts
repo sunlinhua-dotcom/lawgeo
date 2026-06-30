@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import { and, eq, gte, desc } from "drizzle-orm";
+import { and, eq, gte } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { yearMonth } from "@/lib/usage";
@@ -21,8 +20,6 @@ export async function GET(req: Request) {
 
   const [y, m] = ym.split("-").map(Number);
   const monthStart = new Date(y, m - 1, 1);
-  const monthEnd = new Date(y, m, 1);
-
   const queries = await db
     .select()
     .from(schema.aiQueries)

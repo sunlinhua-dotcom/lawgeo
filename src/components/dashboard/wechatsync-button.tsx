@@ -5,7 +5,6 @@ import { Loader2, Send, CheckCircle2, AlertCircle, Download, ExternalLink } from
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  isWechatsyncInstalled,
   waitForWechatsync,
   syncToWechatsync,
   WECHATSYNC_PLATFORMS,

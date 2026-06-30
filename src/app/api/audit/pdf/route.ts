@@ -17,7 +17,7 @@ export async function GET(req: Request) {
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>lawGEO 诊断报告 · ${r.domain}</title>
+<title>BrandGEO 诊断报告 · ${r.domain}</title>
 <style>
   @page { margin: 24mm 16mm; }
   body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; color: #0f172a; line-height: 1.7; max-width: 900px; margin: 0 auto; padding: 24px; }

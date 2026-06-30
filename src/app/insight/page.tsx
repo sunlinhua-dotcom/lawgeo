@@ -10,7 +10,7 @@ import { breadcrumbSchema } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "GEO 洞察系统 — 关键词矩阵与 AI 提及频率分析",
   description:
-    "lawGEO 的 GEO 洞察系统结合微信指数、百度指数、案由词库 × 地域矩阵，识别品牌当前在 AI 搜索中的内容缺口与高 ROI 选题。",
+    "BrandGEO 的 GEO 洞察系统结合微信指数、百度指数、品类词库 × 场景矩阵，识别品牌当前在 AI 搜索中的内容缺口与高 ROI 选题。",
   alternates: { canonical: "/insight" },
 };
 
@@ -34,7 +34,7 @@ export default function InsightPage() {
       <section className="mx-auto max-w-6xl px-4 py-16 lg:px-8">
         <div className="grid gap-6 md:grid-cols-2">
           {[
-            { icon: Target, title: "案由 × 地域矩阵", desc: "内置 1,800+ 律所长尾关键词，按意图、搜索量、AI 提及度排序。" },
+            { icon: Target, title: "品类 × 场景矩阵", desc: "内置 1,800+ 品牌长尾关键词，按意图、搜索量、AI 提及度排序。" },
             { icon: TrendingUp, title: "AI 提及频率", desc: "每日在 12 个平台跑你的关键词，识别哪些选题真的能被 AI 引用。" },
             { icon: GitCompare, title: "竞品引用源拆解", desc: "看清竞品在哪些页面被 AI 引用、引用频次、回答中的排位。" },
             { icon: Filter, title: "意图分级与优先级", desc: "把关键词按信息型/商业型/交易型/导航型分类，决定先做哪个。" },

@@ -1,9 +1,7 @@
 import "server-only";
-import { randomUUID } from "node:crypto";
 import { ask } from "./ai";
 import { runAudit } from "./audit";
-import { db, schema } from "./db";
-import { ingestDocument, retrieve, buildContext } from "./rag";
+import { ingestDocument } from "./rag";
 import { buildPrompt, extractJsonLd, type ContentFormat } from "./prompts";
 import { adaptForPlatform, type PublishPlatform } from "./publish";
 
@@ -16,7 +14,7 @@ export type AgentId =
   | "cake-chief" // 蛋糕 - 首席调度
   | "audit" // 诊断
   | "insight" // 洞察 / 意图
-  | "matrix" // 案由矩阵
+  | "matrix" // 品类矩阵
   | "generator" // 内容生成
   | "compliance" // 合规审查
   | "knowledge" // 知识库
@@ -62,9 +60,9 @@ export const AGENTS: Record<AgentId, AgentDef> = {
   matrix: {
     id: "matrix",
     name: "矩阵 Agent",
-    role: "案由 × 地域",
-    desc: "为律所生成案由 × 城市的关键词矩阵",
-    inputs: { caseType: "案由类别", cities: "目标城市（逗号分隔）" },
+    role: "品类 × 场景",
+    desc: "为品牌生成品类 × 城市的关键词矩阵（如美妆品类 × 城市）",
+    inputs: { caseType: "品类 / 主题", cities: "目标城市（逗号分隔）" },
   },
   generator: {
     id: "generator",
@@ -169,7 +167,7 @@ export async function runAgent(
       }
       case "cake-chief": {
         const r = await ask({
-          system: "你是 lawGEO 的首席调度 Agent「蛋糕」。给用户的业务方向，给出 GEO 落地的 5 步行动计划与最该调用的 Agent 顺序。简洁清晰。",
+          system: "你是 BrandGEO 的首席调度 Agent「蛋糕」。给用户的业务方向，给出 GEO 落地的 5 步行动计划与最该调用的 Agent 顺序。简洁清晰。",
           prompt: `业务方向：${inputs.topic}\n\n请给出：\n1. 应优先调用的 3 个 Agent 与顺序\n2. 预期产出物\n3. 见效周期估算`,
           temperature: 0.4,
         });
@@ -192,7 +190,7 @@ export async function runAgent(
       case "matrix": {
         const cities = (inputs.cities ?? "").split(/[,，]/).map((s) => s.trim()).filter(Boolean);
         const matrix = cities.flatMap((city) =>
-          [`${city}${inputs.caseType}律师怎么收费`, `${city}${inputs.caseType}律师推荐`, `${city}${inputs.caseType}怎么找`].map(
+          [`${city}${inputs.caseType}怎么选`, `${city}${inputs.caseType}推荐`, `${city}${inputs.caseType}哪个好用`].map(
             (kw) => ({ city, keyword: kw }),
           ),
         );
@@ -295,11 +293,11 @@ export const PIPELINES: Array<{
   {
     id: "full-geo",
     name: "🚀 全链路 GEO 启动",
-    desc: "新客户接入：诊断 → 意图聚类 → 案由矩阵 → 批量生成 → 合规审查",
+    desc: "新客户接入：诊断 → 意图聚类 → 品类矩阵 → 批量生成 → 合规审查",
     steps: [
       { agent: "audit", label: "1. 跑域名诊断" },
       { agent: "insight", label: "2. 关键词意图聚类" },
-      { agent: "matrix", label: "3. 案由地域矩阵展开" },
+      { agent: "matrix", label: "3. 品类场景矩阵展开" },
       { agent: "generator", label: "4. 批量内容生成" },
       { agent: "compliance", label: "5. 合规审查" },
     ],

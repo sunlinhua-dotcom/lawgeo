@@ -10,7 +10,7 @@ import { breadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "核心团队 — 顶尖架构师 + AI Agent 数字员工",
-  description: "lawGEO 团队由来自诺基亚、三星、喜马拉雅、新潮传媒的资深架构师组成。配合 15 个 AI Agent 数字员工，技术与产能双轮驱动。",
+  description: "BrandGEO 团队由来自诺基亚、三星、喜马拉雅、新潮传媒的资深架构师组成。配合 15 个 AI Agent 数字员工，技术与产能双轮驱动。",
   alternates: { canonical: "/team" },
 };
 
@@ -47,9 +47,9 @@ const agents = [
   { name: "蛋糕", role: "首席 Agent / 调度器", task: "调度其他 14 个 Agent 协同工作；面向客户的总入口" },
   { name: "诊断 Agent", role: "GEO 健康检查", task: "跑域名诊断，生成 PDF 报告" },
   { name: "洞察 Agent", role: "意图挖掘", task: "关键词聚类、竞品分析、内容缺口识别" },
-  { name: "矩阵 Agent", role: "案由 × 地域", task: "生成长尾关键词矩阵，按 ROI 排序" },
+  { name: "矩阵 Agent", role: "品类 × 场景", task: "生成长尾关键词矩阵，按 ROI 排序" },
   { name: "生成 Agent", role: "内容工厂", task: "FAQ / TL;DR / HowTo / 对比表批量生成" },
-  { name: "合规 Agent", role: "广告法审查", task: "律师 / 金融 / 医美 红线检测" },
+  { name: "合规 Agent", role: "广告法审查", task: "化妆品 / 金融 / 法律 红线检测" },
   { name: "知识库 Agent", role: "RAG 引擎", task: "文档分块、检索、注入" },
   { name: "发布 Agent", role: "多平台适配", task: "改写 + 一键打开 7 大平台编辑器" },
   { name: "监测 Agent", role: "12 平台跑词", task: "每日 cron 抓取，落库 ai_queries" },

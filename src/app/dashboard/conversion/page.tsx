@@ -6,6 +6,10 @@ import { ConversionManager } from "@/components/dashboard/conversion-manager";
 
 export const metadata = { title: "转化追踪", robots: { index: false } };
 
+function daysAgo(days: number) {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+}
+
 export default async function ConversionPage() {
   const session = await getSession();
   if (!session) redirect("/login");
@@ -16,7 +20,7 @@ export default async function ConversionPage() {
     .where(eq(schema.conversionLinks.userId, session.userId))
     .orderBy(desc(schema.conversionLinks.createdAt));
 
-  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const since = daysAgo(30);
   const events = await db
     .select()
     .from(schema.conversionEvents)

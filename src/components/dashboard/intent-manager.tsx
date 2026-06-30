@@ -92,7 +92,7 @@ export function IntentManager({ initialIntents, brandName }: { initialIntents: I
           <Textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder={`每行一个，如：\n成都离婚律师哪个好\n离婚财产怎么分\n${brandName}收费标准`}
+            placeholder={`每行一个，如：\n敏感肌精华液哪个好用\n烟酰胺美白有用吗\n${brandName}怎么样`}
             rows={4}
             hint="可从洞察报告/关键词矩阵复制。添加后点「刷新 GEO 指数」让 AI 评估热度。"
           />

@@ -1,24 +1,27 @@
 import "server-only";
-import type { AuditCheck, AuditResult, CheckStatus } from "./audit-types";
+import type { AuditCheck, AuditResult } from "./audit-types";
 import { getScraper } from "./providers/scraper";
 
-const UA = "lawGEO-audit/1.0 (+https://lawgeo.cn/tools/audit)";
+const UA = "BrandGEO-audit/1.0 (+https://brandgeo.cn/tools/audit)";
 const TIMEOUT_MS = 8000;
 
-async function fetchText(url: string): Promise<{ ok: boolean; status: number; text: string; finalUrl: string }> {
+async function fetchText(
+  url: string,
+  accept = "text/html,*/*",
+): Promise<{ ok: boolean; status: number; text: string; finalUrl: string; contentType: string | null }> {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), TIMEOUT_MS);
   try {
     const res = await fetch(url, {
       method: "GET",
-      headers: { "user-agent": UA, accept: "text/html,*/*" },
+      headers: { "user-agent": UA, accept },
       redirect: "follow",
       signal: ctl.signal,
     });
     const text = await res.text();
-    return { ok: res.ok, status: res.status, text, finalUrl: res.url };
+    return { ok: res.ok, status: res.status, text, finalUrl: res.url, contentType: res.headers.get("content-type") };
   } catch {
-    return { ok: false, status: 0, text: "", finalUrl: url };
+    return { ok: false, status: 0, text: "", finalUrl: url, contentType: null };
   } finally {
     clearTimeout(t);
   }
@@ -68,15 +71,6 @@ function schemaTypes(blocks: unknown[]): string[] {
   return Array.from(types);
 }
 
-function textBetween(html: string, start: RegExp, end: RegExp): string | undefined {
-  const s = html.search(start);
-  if (s < 0) return undefined;
-  const after = html.slice(s);
-  const e = after.search(end);
-  if (e < 0) return undefined;
-  return after.slice(0, e);
-}
-
 function stripTags(s: string) {
   return s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 }
@@ -92,10 +86,13 @@ export async function runAudit(rawDomain: string): Promise<AuditResult> {
   // 主页用 scraper provider 抓取（配了 Firecrawl 时能渲染 SPA + 拿截图）；
   // llms.txt / robots / sitemap 是静态文本，仍用轻量 fetch。
   const scraper = getScraper();
-  const [homePage, llms, llmsFull, robots, sitemap] = await Promise.all([
+  const [homePage, llms, llmsFull, aiIndex, aiSummary, markdownTwin, robots, sitemap] = await Promise.all([
     scraper.scrape(url, { screenshot: false, timeoutMs: TIMEOUT_MS }),
     fetchText(`${url}llms.txt`),
     fetchText(`${url}llms-full.txt`),
+    fetchText(`${url}ai-index.json`, "application/json,*/*"),
+    fetchText(`${url}ai/summary.json`, "application/json,*/*"),
+    fetchText(`${url}index.md`, "text/markdown,*/*"),
     fetchText(`${url}robots.txt`),
     fetchText(`${url}sitemap.xml`),
   ]);
@@ -132,6 +129,12 @@ export async function runAudit(rawDomain: string): Promise<AuditResult> {
   // ── GEO 信号 ───────────────────────────────────────────────────────
   const hasLlmsTxt = llms.ok && llms.text.includes("#");
   const hasLlmsFull = llmsFull.ok && llmsFull.text.length > 100;
+  const hasAiIndex = aiIndex.ok && /"assets"\s*:/.test(aiIndex.text) && /"markdownUrl"\s*:/.test(aiIndex.text);
+  const hasAiSummary = aiSummary.ok && /"recommendedReadingOrder"\s*:/.test(aiSummary.text);
+  const hasMarkdownTwin =
+    markdownTwin.ok &&
+    (markdownTwin.contentType?.includes("markdown") || markdownTwin.text.startsWith("#")) &&
+    markdownTwin.text.includes("Evidence Blocks");
   const hasRobots = robots.ok;
   const hasSitemap = sitemap.ok || robots.text.toLowerCase().includes("sitemap:");
   const hasFaqSection =
@@ -206,12 +209,12 @@ export async function runAudit(rawDomain: string): Promise<AuditResult> {
     },
     {
       id: "llms-txt",
-      label: "llms.txt（关键 GEO 信号）",
+      label: "llms.txt（AI 可读目录，非排名承诺）",
       status: hasLlmsTxt ? "pass" : "fail",
       detail: hasLlmsTxt
-        ? "✅ 已部署，AI 智能体可直接读取站点结构"
-        : "❌ 未部署 llms.txt — 这是 2026 年最重要的 GEO 基建之一",
-      weight: 12,
+        ? "✅ 已部署，可作为 AI 智能体读取站点结构的目录"
+        : "❌ 未部署 llms.txt。它不是排名因子，但会增加 AI 理解站点的成本",
+      weight: 6,
     },
     {
       id: "llms-full",
@@ -221,6 +224,33 @@ export async function runAudit(rawDomain: string): Promise<AuditResult> {
         ? "✅ 长上下文模型友好的完整产品说明已就位"
         : "建议补充 llms-full.txt，给长上下文 Agent 提供完整事实源",
       weight: 6,
+    },
+    {
+      id: "markdown-twin",
+      label: "Markdown twin",
+      status: hasMarkdownTwin ? "pass" : hasLlmsTxt ? "warn" : "fail",
+      detail: hasMarkdownTwin
+        ? "✅ 已发现首页 Markdown twin，且包含可对齐的 Evidence Blocks"
+        : "建议为核心页面生成 .md 版本，并在 HTML 响应中声明 alternate link",
+      weight: 9,
+    },
+    {
+      id: "ai-index",
+      label: "ai-index.json",
+      status: hasAiIndex ? "pass" : "warn",
+      detail: hasAiIndex
+        ? "✅ 已发现机器可读资产索引，包含 Markdown URL"
+        : "建议提供 /ai-index.json，列出 URL、Markdown URL、主题、实体和证据块数量",
+      weight: 6,
+    },
+    {
+      id: "ai-discovery",
+      label: "AI Discovery JSON",
+      status: hasAiSummary ? "pass" : "warn",
+      detail: hasAiSummary
+        ? "✅ 已发现 /ai/summary.json，可供智能体快速理解品牌和推荐阅读顺序"
+        : "建议补充 /ai/summary.json、/ai/faq.json、/ai/service.json、/ai/evidence.json",
+      weight: 5,
     },
     {
       id: "robots",
@@ -318,7 +348,10 @@ export async function runAudit(rawDomain: string): Promise<AuditResult> {
 
   // ── 优先建议 ────────────────────────────────────────────────────────
   const suggestions: string[] = [];
-  if (!hasLlmsTxt) suggestions.push("立即部署 /llms.txt — 这是 2026 年 AI Agent 抓取的入口文件。");
+  if (!hasLlmsTxt) suggestions.push("部署 /llms.txt 作为 AI 可读目录；注意它不是 Google 官方排名因子。");
+  if (!hasMarkdownTwin) suggestions.push("为核心页面生成 Markdown twin，并设置 X-Robots-Tag: noindex。");
+  if (!hasAiIndex) suggestions.push("补充 /ai-index.json，列出 URL、Markdown URL、主题、实体和证据块数量。");
+  if (!hasAiSummary) suggestions.push("补充 AI Discovery JSON，帮助智能体快速理解品牌、服务、FAQ 和证据块。");
   if (!hasFaq) suggestions.push("补充 FAQPage JSON-LD，把现有问答内容结构化（GEO 引用率 +40%）。");
   if (!hasOrg) suggestions.push("注入 Organization JSON-LD，明确品牌实体身份。");
   if (!firstParaIsAnswer) suggestions.push("把每页首段改写为「直接答案」结构，让 AI 摘要时优先抓取。");
@@ -383,6 +416,9 @@ export async function runAudit(rawDomain: string): Promise<AuditResult> {
     geoSignals: {
       llmsTxt: hasLlmsTxt,
       llmsFullTxt: hasLlmsFull,
+      markdownTwin: hasMarkdownTwin,
+      aiIndex: hasAiIndex,
+      aiDiscovery: hasAiSummary,
       robotsTxt: hasRobots,
       sitemap: hasSitemap,
       faqSchema: hasFaq,

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input, Textarea } from "@/components/ui/input";
 
 export function ContactForm() {
-  const [form, setForm] = useState({ name: "", contact: "", industry: "lawyer", message: "" });
+  const [form, setForm] = useState({ name: "", contact: "", industry: "beauty", message: "" });
   const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [err, setErr] = useState<string | null>(null);
 
@@ -57,8 +57,10 @@ export function ContactForm() {
           onChange={(e) => setForm({ ...form, industry: e.target.value })}
           className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900"
         >
+          <option value="beauty">美妆个护 / 化妆品</option>
+          <option value="consumer">消费品 / 零售</option>
+          <option value="sme">专业服务 / 中小企业</option>
           <option value="lawyer">律师事务所</option>
-          <option value="sme">中小企业 / 专业服务</option>
           <option value="b2b">B2B / 制造业</option>
           <option value="local">本地生活 / 教育</option>
           <option value="other">其他</option>

@@ -6,9 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbSchema } from "@/lib/seo";
 import { CASES } from "@/data/cases";
-import { ArrowRight, Scale, GraduationCap, Coffee, Smartphone, Megaphone, Store, Landmark, Globe, Building2 } from "lucide-react";
+import { ArrowRight, Scale, GraduationCap, Coffee, Smartphone, Megaphone, Store, Landmark, Globe, Building2, Sparkles } from "lucide-react";
 
 const ICONS: Record<string, React.ElementType> = {
+  cosmetics: Sparkles,
   lawyer: Scale,
   education: GraduationCap,
   fmcg: Coffee,
@@ -20,8 +21,8 @@ const ICONS: Record<string, React.ElementType> = {
 };
 
 export const metadata: Metadata = {
-  title: "行业方案 / 标杆案例 — 8 大行业 GEO 增长记录",
-  description: "lawGEO 在 8 大行业的真实标杆案例：律所 / 教育 / 快消 / 消费电子 / 广告媒体 / 招商加盟 / 金融 / AI 出海。",
+  title: "行业方案 / 标杆案例 — 美妆个护旗舰，全行业 GEO 增长记录",
+  description: "BrandGEO 的真实标杆案例：以美妆个护为旗舰，覆盖快消 / 消费电子 / 教育 / 广告媒体 / 招商加盟 / 金融 / AI 出海，律所等专业服务为附属垂直。",
   alternates: { canonical: "/cases" },
 };
 
@@ -31,14 +32,14 @@ export default function CasesPage() {
       <JsonLd data={breadcrumbSchema([{ name: "首页", path: "/" }, { name: "行业方案", path: "/cases" }])} />
       <PageHero
         badge="8 大行业 · 真实标杆案例"
-        title={<>不只律所，<span className="gradient-text">所有高决策行业</span>都需要 GEO</>}
+        title={<>从美妆到专业服务，<span className="gradient-text">所有品牌</span>都需要 GEO</>}
         description="每个案例都附完整的客户背景、优化策略与达成数字。点击进入查看详细路径。"
       />
       <section className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {CASES.map((c) => {
             const Icon = ICONS[c.slug] ?? Building2;
-            const isFeatured = c.slug === "lawyer";
+            const isFeatured = c.slug === "cosmetics";
             return (
               <Link key={c.slug} href={`/cases/${c.slug}`}>
                 <Card className={`lift h-full ${isFeatured ? "border-indigo-300 bg-gradient-to-br from-indigo-50 to-white dark:border-indigo-900 dark:from-indigo-950 dark:to-slate-900" : ""}`}>

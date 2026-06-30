@@ -4,13 +4,13 @@ import { CheckCircle2, X, Target, Trophy, Award, ShieldCheck, ArrowRight } from 
 import { PageHero } from "@/components/layout/page-hero";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbSchema, faqSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "定价方案 — 月费订阅 或 按效果付费（KPI）",
   description: "两种付费模式：月费 8K / 18K / 50K 起，或按意图词效果付费（Top1 ¥6,900 / Top3 ¥5,900 / 推荐露出 ¥4,900），未达 KPI 全额退款。",
+  // 注：示例文案以美妆个护为旗舰行业，律所等为支持的众多行业之一。
   alternates: { canonical: "/pricing" },
 };
 
@@ -18,12 +18,12 @@ const tiers = [
   {
     name: "起步版",
     price: 8000,
-    suit: "适合初次尝试 GEO 的律所与中小企业",
+    suit: "适合初次尝试 GEO 的品牌与中小企业",
     features: [
       { ok: true, text: "30 个关键词" },
       { ok: true, text: "4 个 AI 平台监测" },
       { ok: true, text: "AI 生成 30 篇 / 月" },
-      { ok: true, text: "案由 × 地域矩阵基础版" },
+      { ok: true, text: "品类 × 场景矩阵基础版" },
       { ok: true, text: "月度趋势报告" },
       { ok: false, text: "多平台分发" },
       { ok: false, text: "1v1 顾问" },
@@ -33,12 +33,12 @@ const tiers = [
     name: "标准版",
     price: 18000,
     featured: true,
-    suit: "推荐：中型律所与连锁专业服务",
+    suit: "推荐：成长型品牌与连锁零售",
     features: [
       { ok: true, text: "100 个关键词" },
       { ok: true, text: "12 个 AI 平台监测" },
       { ok: true, text: "AI 生成 200 篇 / 月" },
-      { ok: true, text: "案由 × 地域矩阵完整版" },
+      { ok: true, text: "品类 × 场景矩阵完整版" },
       { ok: true, text: "7 渠道多平台分发" },
       { ok: true, text: "周度趋势报告 + 邮件预警" },
       { ok: true, text: "2 次 / 月 1v1 顾问" },
@@ -47,12 +47,12 @@ const tiers = [
   {
     name: "企业版",
     price: "50000+",
-    suit: "大型律所、集团公司、连锁机构",
+    suit: "大型品牌、集团公司、连锁机构",
     features: [
       { ok: true, text: "关键词不限" },
       { ok: true, text: "12 个 AI 平台监测" },
       { ok: true, text: "AI 生成不限量" },
-      { ok: true, text: "定制案由词库" },
+      { ok: true, text: "定制品类词库" },
       { ok: true, text: "私有化部署 / 数据本地" },
       { ok: true, text: "定制周报 + 月度复盘" },
       { ok: true, text: "专属顾问 + SLA" },
@@ -92,7 +92,7 @@ const kpiTiers = [
 ];
 
 const faqs = [
-  { q: "「意图词」是什么？", a: "意图词指某一个语义簇，例如「社区电梯媒体」。基于这个词延伸出来的几十上百个长尾（「推荐」「哪家强」「哪个好」）因为语义相同，全部包含赠送。一个意图词 = 一个语义 + 它的全部长尾变体。" },
+  { q: "「意图词」是什么？", a: "意图词指某一个语义簇，例如「敏感肌精华液」。基于这个词延伸出来的几十上百个长尾（「推荐」「哪个好用」「怎么挑」）因为语义相同，全部包含赠送。一个意图词 = 一个语义 + 它的全部长尾变体。" },
   { q: "未达 KPI 真的全额退款？", a: "是的。我们对每个意图词设定 80% 成功率作为交付标准（100 次查询 ≥80 次满足 KPI）。未达成功率，按未达成的意图词数量等比退款。退款流程明确写入合同。" },
   { q: "KPI 付费的服务周期？", a: "交付后 3 个月 / 平台（豆包、DeepSeek 为主平台），并额外赠送您在腾讯元宝、通义、Kimi、文心等主流 AI 平台的优化服务。" },
   { q: "如何验收？", a: "我们提供完整的查询日志（带时间戳、平台、查询语句、返回内容、品牌位置）。支持第三方数据核验。" },
@@ -182,7 +182,7 @@ export default function PricingPage() {
           </div>
 
           <div className="mt-8 rounded-xl bg-indigo-50 px-4 py-3 text-sm text-indigo-900 dark:bg-indigo-950 dark:text-indigo-200">
-            💡 「意图词」语义示例：「上海离婚律师」是一个意图词，<em>「上海离婚律师推荐」「上海哪家离婚律师好」「上海离婚律师收费」</em> 等长尾全部包含。
+            💡 「意图词」语义示例：「敏感肌精华液」是一个意图词，<em>「敏感肌精华液推荐」「敏感肌精华液哪个好用」「敏感肌精华液怎么挑」</em> 等长尾全部包含。
           </div>
         </div>
       </section>

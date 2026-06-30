@@ -18,25 +18,31 @@ export const LOCALES: Record<Locale, { label: string; flag: string; nativeName: 
   ja: { label: "日本語", flag: "🇯🇵", nativeName: "日本語", geoFocus: "ChatGPT / Claude / Gemini" },
 };
 
-function localeInstruction(locale: Locale): string {
+export function normalizeLocale(locale?: Locale | string): Locale {
+  const raw = (locale ?? "zh").toLowerCase().replace("_", "-");
+  if (raw === "zh-cn" || raw === "zh-hans" || raw === "cn") return "zh";
+  return Object.prototype.hasOwnProperty.call(LOCALES, raw) ? (raw as Locale) : "zh";
+}
+
+function localeInstruction(localeInput?: Locale | string): string {
+  const locale = normalizeLocale(localeInput);
   if (locale === "zh") return "";
   const meta = LOCALES[locale];
   return `\n\n## Output language: ${meta.nativeName} (${meta.label})\n你输出的所有内容必须用 ${meta.nativeName} 撰写，母语级表达，不带翻译腔。目标 AI 平台：${meta.geoFocus}。所有 schema.org JSON-LD 字段值也用此语言。`;
 }
 
-const GEO_SYSTEM_BASE = `你是 lawGEO 的 GEO 内容生成专家。你的任务是把用户提供的素材，改写成「最容易被大模型引用」的中文内容。
+const GEO_SYSTEM_BASE = `你是 BrandGEO 的 GEO 内容生成专家。你的任务是把用户提供的素材，改写成「最容易被大模型引用」的中文内容，适用于美妆个护、消费品、零售、专业服务等任意行业的品牌。
 
 GEO 写作原则（必须遵守）：
 1. 首段一定是「直接答案」(answer-first)，不要先讲背景，AI 摘要时会优先抓首段。
 2. 段落短且独立，每段都可被单独引用，不要写"如上文所述"这类指代。
-3. 事实密度高：保留具体的数字、价格区间、流程步骤、案例、边界条件。
+3. 事实密度高：保留具体的数字、成分/规格、价格区间、使用步骤、适用人群、边界条件。
 4. 用「问题—答案」「步骤—说明」「对比—结论」三类结构组织内容。
-5. 律师业务相关内容必须通过广告合规审查：
-   - 不得使用「最」「第一」「绝对」「100% 胜诉」「保证赢」等绝对化用语
-   - 不得暗示与司法机关、监管部门有特殊关系
-   - 不得对个案承诺胜诉率
-   - 不得贬损其他律所
-   - 案例展示需脱敏并附「以个案为准」提示
+5. 广告与品牌合规（按行业自动适配，必须遵守）：
+   - 通用：不得使用「最」「第一」「国家级」「绝对」「100%」等绝对化用语；不贬损竞品；引用第三方数据需可溯源。
+   - 美妆 / 化妆品（《化妆品监督管理条例》《广告法》）：普通化妆品不得宣称医疗功效（如「治疗」「祛疤」「抗炎」）；不得宣称「速效」「纯天然/无添加」等误导性表述；功效宣称需有依据，必要时标注「功效仅供参考，个体差异」；涉及特殊化妆品（防晒/美白/染发/烫发/防脱）需符合特殊化妆品规范。
+   - 食品 / 保健：不得宣称疾病预防治疗功效。
+   - 专业服务（律师/医疗/金融）：不承诺结果，不暗示与监管机关特殊关系，案例需脱敏并标注「以个案为准」。
 6. 输出格式严格遵循用户指定的结构。`;
 
 export function buildPrompt(opts: {
@@ -45,14 +51,14 @@ export function buildPrompt(opts: {
   context?: string;
   region?: string;
   caseType?: string;
-  locale?: Locale;
+  locale?: Locale | string;
 }): { system: string; user: string } {
   const formatInstructions = FORMAT_RULES[opts.format];
   const localizer = opts.region
     ? `\n本内容针对地域：${opts.region}。请在标题、首段、FAQ 中体现地域。`
     : "";
-  const caseHint = opts.caseType ? `\n本内容针对的案由：${opts.caseType}。` : "";
-  const locale = opts.locale ?? "zh";
+  const caseHint = opts.caseType ? `\n本内容针对的品类 / 主题：${opts.caseType}。` : "";
+  const locale = normalizeLocale(opts.locale);
 
   const user = `话题：${opts.topic}${localizer}${caseHint}
 

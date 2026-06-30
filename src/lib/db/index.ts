@@ -9,9 +9,7 @@ const DB_PATH =
   process.env.DATABASE_URL?.replace(/^file:/, "") ?? path.join(process.cwd(), "data", "lawgeo.db");
 
 declare global {
-  // eslint-disable-next-line no-var
   var __lawgeo_sqlite: Database.Database | undefined;
-  // eslint-disable-next-line no-var
   var __lawgeo_drizzle: ReturnType<typeof drizzle<typeof schema>> | undefined;
 }
 

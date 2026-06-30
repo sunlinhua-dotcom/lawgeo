@@ -10,7 +10,7 @@ import { breadcrumbSchema, howToSchema } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "AI 内容生成 — FAQ / TL;DR / HowTo / 对比表 / 直接答案",
   description:
-    "lawGEO 的 AI 内容生成引擎针对国内大模型 + Claude/ChatGPT/Perplexity 优化，一次输出 FAQ + TL;DR + HowTo + 对比表 + 直接答案段落，自带 schema.org JSON-LD。",
+    "BrandGEO 的 AI 内容生成引擎针对国内大模型 + Claude/ChatGPT/Perplexity 优化，一次输出 FAQ + TL;DR + HowTo + 对比表 + 直接答案段落，自带 schema.org JSON-LD。",
   alternates: { canonical: "/generate" },
 };
 
@@ -28,11 +28,11 @@ export default function GeneratePage() {
         data={[
           breadcrumbSchema([{ name: "首页", path: "/" }, { name: "AI 内容生成", path: "/generate" }]),
           howToSchema({
-            name: "如何用 lawGEO 生成 AI 友好内容",
-            description: "三步把任意律师业务素材转成 GEO 友好的 FAQ + HowTo + 对比表",
+            name: "如何用 BrandGEO 生成 AI 友好内容",
+            description: "三步把任意品牌业务素材转成 GEO 友好的 FAQ + HowTo + 对比表",
             steps: [
-              { name: "粘贴或上传素材", text: "把案件介绍、收费说明、流程文档贴入" },
-              { name: "选择目标关键词", text: "从案由 × 地域矩阵里选 1–10 个目标关键词" },
+              { name: "粘贴或上传素材", text: "把产品介绍、成分功效、使用流程文档贴入" },
+              { name: "选择目标关键词", text: "从品类 × 场景矩阵里选 1–10 个目标关键词" },
               { name: "一键生成 4 种格式", text: "FAQ / TL;DR / HowTo / 对比表 + JSON-LD 一次导出" },
             ],
           }),
@@ -71,26 +71,26 @@ export default function GeneratePage() {
 
         <div className="mt-16 grid gap-8 md:grid-cols-2">
           <div>
-            <h2 className="text-2xl font-semibold">为什么 AI 更愿意引用 lawGEO 生成的内容？</h2>
+            <h2 className="text-2xl font-semibold">为什么 AI 更愿意引用 BrandGEO 生成的内容？</h2>
             <ul className="mt-4 space-y-3 text-slate-700 dark:text-slate-300">
               <li>✓ 首段强制直答（answer-first），AI 摘要直接抓首段</li>
               <li>✓ 事实密度高（含价格、流程、案例、边界条件）</li>
               <li>✓ 每段可被单独引用，结构化数据完整</li>
               <li>✓ 自带 FAQPage / HowTo / Article JSON-LD</li>
-              <li>✓ 律所专属合规审查模板，规避广告法红线</li>
+              <li>✓ 化妆品广告合规审查模板，规避医疗功效、绝对化用语、速效宣称等红线</li>
             </ul>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-900 p-6 font-mono text-xs text-emerald-300 dark:border-slate-800">
-            <div className="mb-2 text-slate-500">// 输出示例</div>
+            <div className="mb-2 text-slate-500">{"// 输出示例"}</div>
             <pre className="overflow-x-auto whitespace-pre-wrap">{`{
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [{
     "@type": "Question",
-    "name": "上海离婚律师怎么收费？",
+    "name": "敏感肌精华液哪个好用？",
     "acceptedAnswer": {
       "@type": "Answer",
-      "text": "上海离婚律师收费分三种：风险代理 …"
+      "text": "敏感肌选精华液优先看三点：成分简、无香精酒精 …"
     }
   }]
 }`}</pre>

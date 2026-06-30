@@ -83,8 +83,8 @@ export default async function KeywordsPage() {
                 <thead className="text-xs uppercase text-slate-500">
                   <tr>
                     <th className="px-3 py-2 text-left">关键词</th>
-                    <th className="px-3 py-2 text-left">案由</th>
-                    <th className="px-3 py-2 text-left">地域</th>
+                    <th className="px-3 py-2 text-left">品类</th>
+                    <th className="px-3 py-2 text-left">场景</th>
                     <th className="px-3 py-2 text-left">意图</th>
                     <th className="px-3 py-2 text-right">月搜索量</th>
                     <th className="px-3 py-2 text-right">优先级</th>

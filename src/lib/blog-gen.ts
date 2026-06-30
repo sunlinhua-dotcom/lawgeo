@@ -1,6 +1,6 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db, schema } from "./db";
 import { ask } from "./ai";
 import { findIndustry } from "@/data/industries";
@@ -59,7 +59,7 @@ GEO 写作铁律（必须全部遵守）：
 6. 对比表：涉及对比的场景必须用 markdown 表格。
 7. 不准虚构事实。如果不确定数字，写区间 / 行业平均，不准编造。
 8. 字数控制：1500–2500 字。
-9. 律师 / 金融 / 医美等敏感行业，禁用「最」「第一」「100%」「保证胜诉」「无效退款」等绝对化用语。
+9. 美妆个护 / 金融 / 医美 / 律师等敏感行业，禁用「最」「第一」「100%」「速效」「根治」「无效退款」「保证胜诉」等绝对化用语；美妆不得宣称医疗功效。
 
 输出格式：纯 markdown，不要加 \`\`\` 包裹。最后追加一个 \`\`\`json-ld\`\`\` 代码块，内含完整的 schema.org Article JSON-LD。`;
 
@@ -218,7 +218,7 @@ export async function runBulkJob(jobId: string) {
     .where(eq(schema.bulkJobs.id, jobId));
 
   // 拉作者信息
-  let authorName = "lawGEO 编辑部";
+  let authorName = "BrandGEO 编辑部";
   let authorBio: string | undefined;
   let authorTitle: string | undefined;
   let authorId: string | null = null;

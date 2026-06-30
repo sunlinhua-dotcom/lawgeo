@@ -223,7 +223,7 @@ export function ConversionManager({
           <div className="grid gap-3 md:grid-cols-3">
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-600">标签</label>
-              <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="如：律所案例咨询" />
+              <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="如：官方旗舰店 / 会员注册" />
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-600">来源</label>
@@ -237,7 +237,7 @@ export function ConversionManager({
             </div>
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-600">活动名</label>
-              <Input value={campaign} onChange={(e) => setCampaign(e.target.value)} placeholder="2026Q1-lawyer" />
+              <Input value={campaign} onChange={(e) => setCampaign(e.target.value)} placeholder="2026Q1-beauty" />
             </div>
           </div>
           <Button onClick={create} disabled={busy || !targetUrl} variant="primary">

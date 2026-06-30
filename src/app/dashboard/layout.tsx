@@ -1,24 +1,4 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import {
-  LayoutDashboard,
-  Search,
-  Sparkles,
-  Bot,
-  Database,
-  Users,
-  LogOut,
-  Building2,
-  BellRing,
-  Share2,
-  CreditCard,
-  BookOpen,
-  Link2,
-  FileBarChart,
-  Workflow,
-  Plug,
-  FileText,
-} from "lucide-react";
 import { getSession } from "@/lib/auth";
 import { listBrands, getCurrentBrand } from "@/lib/brand";
 import { DashSidebar } from "@/components/dashboard/sidebar";
@@ -37,6 +17,7 @@ const NAV_GROUPS = [
       { href: "/dashboard/realtime", label: "实时查询", icon: "Zap" as const, badge: "转化" },
       { href: "/dashboard/monitor", label: "数据监测追踪", icon: "Activity" as const },
       { href: "/dashboard/brand-assets", label: "AI 品牌资产", icon: "Sparkles" as const },
+      { href: "/dashboard/geo-citation", label: "GEO 引用工程", icon: "Network" as const, badge: "PRD" },
     ],
   },
   {

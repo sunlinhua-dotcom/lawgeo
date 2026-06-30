@@ -3,13 +3,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { and, desc, eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbSchema, articleSchema } from "@/lib/seo";
+import { breadcrumbSchema } from "@/lib/seo";
 import { INDUSTRIES, findIndustry } from "@/data/industries";
-import { ArrowRight, BookOpen, User } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 export const revalidate = 60;
 

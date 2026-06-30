@@ -9,7 +9,7 @@ import { POSTS } from "@/data/blog";
 
 export const metadata: Metadata = {
   title: "知识库 — GEO 教程、案例、行业洞察",
-  description: "lawGEO 知识库：GEO 入门、llms.txt 部署、律所实战手册、行业案例与方法论。",
+  description: "BrandGEO 知识库：GEO 入门、llms.txt 部署、美妆个护实战手册、行业案例与方法论。",
   alternates: { canonical: "/blog" },
 };
 
@@ -20,7 +20,7 @@ export default function BlogIndexPage() {
       <PageHero
         badge="知识库"
         title={<>GEO <span className="gradient-text">教程</span> · 案例 · 方法论</>}
-        description="把 lawGEO 团队在律所 GEO 实战中沉淀的方法论、案例与教程整理成可执行文章。"
+        description="把 BrandGEO 团队在全行业 GEO 实战中沉淀的方法论、案例与教程整理成可执行文章。"
       />
       <section className="mx-auto max-w-5xl px-4 py-16 lg:px-8">
         <div className="grid gap-6 md:grid-cols-2">

@@ -19,7 +19,6 @@ import {
   Users,
   CreditCard,
   FileText,
-  Building2,
   Home,
   Briefcase,
   Target,
@@ -36,6 +35,7 @@ import {
   PenTool,
   Zap,
   Activity,
+  Network,
   type LucideIcon,
 } from "lucide-react";
 
@@ -55,6 +55,7 @@ const items: CmdItem[] = [
   { title: "实时查询（追问转化）", href: "/dashboard/realtime", icon: Zap, group: "GEO 全链路" },
   { title: "数据监测追踪", href: "/dashboard/monitor", icon: Activity, group: "GEO 全链路" },
   { title: "AI 品牌资产", href: "/dashboard/brand-assets", icon: Sparkles, group: "GEO 全链路" },
+  { title: "GEO 引用工程", href: "/dashboard/geo-citation", icon: Network, group: "GEO 全链路" },
 
   // 控制台
   { title: "控制台 · 概览", href: "/dashboard", icon: LayoutDashboard, group: "控制台" },
@@ -78,7 +79,7 @@ const items: CmdItem[] = [
   { title: "免费 GEO 诊断", href: "/tools/audit", icon: Search, group: "工具", keywords: ["audit", "诊断", "score"] },
   { title: "AI 内容生成", href: "/tools/generate", icon: Sparkles, group: "工具" },
   { title: "意图聚类", href: "/tools/intent", icon: Target, group: "工具" },
-  { title: "律所案由地域矩阵", href: "/tools/matrix", icon: Database, group: "工具" },
+  { title: "品类场景矩阵", href: "/tools/matrix", icon: Database, group: "工具" },
   { title: "12 平台 AI 对比", href: "/tools/compare", icon: Bot, group: "工具" },
 
   // 行业博客

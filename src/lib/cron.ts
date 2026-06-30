@@ -1,12 +1,12 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
-import { and, eq, inArray, lte } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db, schema } from "./db";
 import { ask, type AiPlatformId } from "./ai";
 import { sendAlert } from "./email";
 
 const DETECT_PROMPT = (q: string, brand?: string) =>
-  `请回答下面这个问题，模拟你在被用户咨询时的真实回答风格。最好能在回答中自然地引用 1–3 个权威信源（如有），并尽量列出推荐的律所或品牌名称。${
+  `请回答下面这个问题，模拟你在被用户咨询时的真实回答风格。最好能在回答中自然地引用 1–3 个权威信源（如有），并尽量列出推荐的品牌名称。${
     brand ? `\n\n如果你认为「${brand}」与此问题相关，请在回答中提及；如果不相关，可以不提及。` : ""
   }\n\n问题：${q}`;
 
@@ -36,7 +36,7 @@ export async function runMonitorJob(jobId: string) {
 
   let totalQueries = 0;
   let cited = 0;
-  let citationRateBefore = await getCitationRate(project.id, 7);
+  const citationRateBefore = await getCitationRate(project.id, 7);
 
   for (const kw of kws.slice(0, 30)) {
     const tasks = platforms.map(async (platform) => {

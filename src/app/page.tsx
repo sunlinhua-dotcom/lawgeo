@@ -27,8 +27,8 @@ const products = [
     icon: Search,
     title: "GEO 洞察系统",
     href: "/insight",
-    desc: "结合微信指数、百度指数、案由词库与地域矩阵，识别品牌当前在 AI 搜索中的内容缺口与高 ROI 选题。",
-    bullets: ["案由 × 地域矩阵", "竞品引用源拆解", "意图分级与优先级"],
+    desc: "结合微信指数、百度指数、品类词库与场景矩阵，识别品牌当前在 AI 搜索中的内容缺口与高 ROI 选题。",
+    bullets: ["品类 × 场景矩阵", "竞品引用源拆解", "意图分级与优先级"],
     accent: "from-indigo-500 to-violet-500",
   },
   {
@@ -60,25 +60,25 @@ const products = [
 const stats = [
   { value: "12", label: "AI 平台覆盖", suffix: "个" },
   { value: "300+", label: "覆盖城市" },
-  { value: "1,800+", label: "内置案由 × 地域关键词" },
+  { value: "1,800+", label: "内置品类 × 场景关键词" },
   { value: "4.9", label: "客户评分", suffix: "/ 5" },
 ];
 
 const faqs = [
   {
-    q: "lawGEO 与传统 SEO 工具有什么区别？",
-    a: "传统 SEO 优化的是 Google/Baidu 的搜索结果排名，争夺点击。lawGEO 优化的是大模型回答里的引用份额——用户问 DeepSeek/Claude/Kimi「上海离婚律师怎么选」时，你的内容被不被提及、被排在第几位、引用源 URL 是谁。这是两条完全不同的赛道。",
+    q: "BrandGEO 与传统 SEO 工具有什么区别？",
+    a: "传统 SEO 优化的是 Google/Baidu 的搜索结果排名，争夺点击。BrandGEO 优化的是大模型回答里的引用份额——用户问 DeepSeek/Claude/Kimi「敏感肌精华液哪个好用」时，你的内容被不被提及、被排在第几位、引用源 URL 是谁。这是两条完全不同的赛道。",
   },
   {
-    q: "为什么律所特别需要 GEO？",
-    a: "法律咨询是高意图、高 LTV、决策周期长的典型场景。当事人越来越习惯先问 AI，再决定是否联系律师。如果 AI 推荐的永远是别家，再好的官网都拿不到咨询。lawGEO 让你的内容成为 AI 推荐律所时的首选引用源。",
+    q: "为什么美妆品牌特别需要 GEO？",
+    a: "护肤选购是高意图、高复购、决策周期长的典型场景。消费者越来越习惯先问 AI 成分功效、肤质适配，再决定下单。如果 AI 推荐的永远是别家，再好的官网和详情页都拿不到转化。BrandGEO 让你的内容成为 AI 推荐产品时的首选引用源。",
   },
   {
     q: "多久能看到效果？",
     a: "实时检索层（Perplexity、Kimi 联网模式、文心一言搜索）在内容发布并被收录后 1–3 周可见引用变化；模型训练层（Claude/GPT/DeepSeek 等纯参数模型）需要 3–6 个月持续沉淀。",
   },
   {
-    q: "lawGEO 收费模式？",
+    q: "BrandGEO 收费模式？",
     a: "起步版 8,000 元 / 月，含 30 个关键词、4 个平台监测、AI 生成 30 篇/月。标准版 18,000 元 / 月，含 100 个关键词、12 平台监测、AI 生成 200 篇/月。企业版可定制。年付享 2 折优惠。",
   },
 ];
@@ -103,15 +103,15 @@ export default function HomePage() {
               <Sparkles className="mr-1.5 h-3 w-3" /> 2026 GEO 全新升级 · 12 平台覆盖
             </Badge>
             <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-slate-50">
-              让 AI 在回答法律问题时
+              让 AI 在回答选购问题时
               <br />
-              <span className="gradient-text">先推荐你的律所</span>
+              <span className="gradient-text">先推荐你的品牌</span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-              lawGEO 是国内首家面向 <strong className="text-slate-900 dark:text-slate-100">律师事务所</strong> 的 GEO（生成式引擎优化）平台。
+              BrandGEO 是国内首家面向 <strong className="text-slate-900 dark:text-slate-100">美妆个护与消费品牌</strong> 的 GEO（生成式引擎优化）平台。
               我们把你的官网内容打磨成 DeepSeek、文心、通义、豆包、Kimi、Claude、ChatGPT 共
               <span className="num"> 12 </span>个主流大模型最愿意引用的权威信源——
-              不是争搜索结果，而是争 AI 推荐律所时的<strong className="text-slate-900 dark:text-slate-100">第一个名字</strong>。
+              不是争搜索结果，而是争 AI 推荐产品时的<strong className="text-slate-900 dark:text-slate-100">第一个名字</strong>。
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button asChild size="xl" variant="primary">
@@ -231,29 +231,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── 律所行业深度 ────────────────────────────────────────────── */}
+      {/* ── 美妆行业深度 ────────────────────────────────────────────── */}
       <section className="relative overflow-hidden border-b border-slate-100 dark:border-slate-900">
         <div className="absolute inset-0 bg-gradient-to-b from-indigo-50/40 to-transparent dark:from-indigo-950/20" />
         <div className="relative mx-auto max-w-7xl px-4 py-20 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
-              <Badge variant="primary" className="mb-3">律所专属</Badge>
+              <Badge variant="primary" className="mb-3">美妆专属</Badge>
               <h2 className="text-3xl font-semibold tracking-tight lg:text-4xl">
-                内置 <span className="num">1,800+</span> 案由 ×<br />
-                <span className="num">300+</span> 城市关键词矩阵
+                内置 <span className="num">1,800+</span> 品类 ×<br />
+                <span className="num">300+</span> 场景关键词矩阵
               </h2>
               <p className="mt-6 leading-relaxed text-slate-600 dark:text-slate-400">
-                我们把民事、刑事、行政、婚姻家事、劳动、合同、知识产权、债务、税务、医疗、交通事故等
-                所有常见案由，与全国 300+ 主要城市做组合，预生成
+                我们把精华、面霜、防晒、面膜、洁面、水乳、彩妆、身体护理、洗护、香氛等
+                所有常见品类，与敏感肌、油痘肌、抗老、美白、补水、换季等典型场景做组合，预生成
                 <span className="num"> 1,800+ </span>
                 条高价值长尾关键词。一键拉取，自动按竞争度、搜索量、AI 提及频率排序。
               </p>
               <ul className="mt-6 space-y-3">
                 {[
-                  "覆盖 100% 高发案由 + 全国地级市以上行政区",
+                  "覆盖主流品类 + 全肤质 / 全功效场景",
                   "AI 提及频率每日刷新，识别真正有流量的组合",
                   "一键批量生成 FAQ 页面 + 落地页骨架",
-                  "内置合规审查模板，避免广告法红线",
+                  "内置化妆品广告合规审查，避免功效宣称红线",
                 ].map((it) => (
                   <li key={it} className="flex items-start gap-2">
                     <ShieldCheck className="mt-0.5 h-5 w-5 flex-shrink-0 text-indigo-600" />
@@ -262,7 +262,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <Button asChild size="lg" variant="primary" className="mt-8">
-                <Link href="/tools/matrix">体验案由矩阵生成器</Link>
+                <Link href="/tools/matrix">体验品类矩阵生成器</Link>
               </Button>
             </div>
 
@@ -273,16 +273,16 @@ export default function HomePage() {
                   <div className="h-2 w-2 rounded-full bg-amber-400" />
                   <div className="h-2 w-2 rounded-full bg-emerald-400" />
                 </div>
-                <span>case-matrix.lawgeo.cn</span>
+                <span>case-matrix.brandgeo.cn</span>
               </div>
               <div className="space-y-3 text-sm">
                 {[
-                  { kw: "上海离婚律师怎么收费", vol: "2.1k", ai: "高", color: "emerald" },
-                  { kw: "深圳劳动仲裁找哪家律所", vol: "1.8k", ai: "高", color: "emerald" },
-                  { kw: "北京合同纠纷律师推荐", vol: "1.6k", ai: "中", color: "amber" },
-                  { kw: "杭州知识产权律师哪个好", vol: "1.2k", ai: "高", color: "emerald" },
-                  { kw: "广州交通事故律师免费咨询", vol: "950", ai: "中", color: "amber" },
-                  { kw: "成都刑事辩护律师推荐", vol: "820", ai: "低", color: "rose" },
+                  { kw: "敏感肌精华液哪个好用", vol: "2.1k", ai: "高", color: "emerald" },
+                  { kw: "烟酰胺美白精华有用吗", vol: "1.8k", ai: "高", color: "emerald" },
+                  { kw: "油皮用什么防晒不闷痘", vol: "1.6k", ai: "中", color: "amber" },
+                  { kw: "玻尿酸精华怎么用效果好", vol: "1.2k", ai: "高", color: "emerald" },
+                  { kw: "视黄醇敏感肌能用吗", vol: "950", ai: "中", color: "amber" },
+                  { kw: "油痘肌怎么护肤", vol: "820", ai: "低", color: "rose" },
                 ].map((row) => (
                   <div
                     key={row.kw}
@@ -314,15 +314,15 @@ export default function HomePage() {
           <div className="mb-14 text-center">
             <Badge variant="primary" className="mb-3">行业方案</Badge>
             <h2 className="text-3xl font-semibold tracking-tight lg:text-4xl">
-              不只律所，所有<span className="gradient-text">高决策成本</span>行业都需要 GEO
+              不只美妆，所有<span className="gradient-text">高决策成本</span>行业都需要 GEO
             </h2>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { icon: Scale, name: "律所 / 法律服务", href: "/cases/lawyer", featured: true },
-              { icon: Building2, name: "中小企业 / 专业服务", href: "/cases/sme" },
+              { icon: Sparkles, name: "美妆个护 / 消费品", href: "/cases/cosmetics", featured: true },
+              { icon: Building2, name: "零售 / 连锁品牌", href: "/cases/sme" },
               { icon: Globe, name: "B2B / 制造业", href: "/cases/b2b" },
-              { icon: Sparkles, name: "本地生活 / 医美教育", href: "/cases/local" },
+              { icon: Scale, name: "律所 / 专业服务", href: "/cases/lawyer" },
             ].map((c) => {
               const Icon = c.icon;
               return (

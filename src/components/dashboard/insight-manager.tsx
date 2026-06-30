@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input, Textarea } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { cn } from "@/lib/utils";
@@ -124,7 +124,7 @@ export function InsightManager({
               label="种子关键词（可选）"
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
-              placeholder={"每行一个，如：\n离婚律师\n财产分割\n抚养权"}
+              placeholder={"每行一个，如：\n敏感肌精华\n烟酰胺美白\n视黄醇抗老"}
               rows={3}
               hint="留空也行，AI 会按行业自动挖词"
             />

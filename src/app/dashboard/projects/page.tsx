@@ -19,7 +19,7 @@ export default async function ProjectsPage() {
     <div className="px-6 py-8 lg:px-10">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold">项目管理</h1>
-        <p className="mt-1 text-sm text-slate-500">每个项目对应一个律所 / 品牌。可绑定关键词、监测周期与发布渠道。</p>
+        <p className="mt-1 text-sm text-slate-500">每个项目对应一个品牌 / 产品线。可绑定关键词、监测周期与发布渠道。</p>
       </div>
       <ProjectsManager initialProjects={projects} />
     </div>

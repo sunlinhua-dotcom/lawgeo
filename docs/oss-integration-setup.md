@@ -1,6 +1,6 @@
 # OSS 集成接入手册（自部署开关）
 
-> lawGEO 用「Provider 适配层」把多个成熟开源项目包进来：每个能力都有**内置兜底**，配好对应 env 后**自动切换**到外部 OSS，失败再**自动降级**回内置。无需改任何业务代码。
+> BrandGEO 用「Provider 适配层」把多个成熟开源项目包进来：每个能力都有**内置兜底**，配好对应 env 后**自动切换**到外部 OSS，失败再**自动降级**回内置。无需改任何业务代码。
 > 适配层代码：`src/lib/providers/`　|　选型理由：`docs/oss-integration-research.md`
 
 查看当前各能力用的是哪个 provider：登录后访问 `GET /api/providers/status`，或看「数据监测追踪」页底部「OSS 集成状态」卡片。
@@ -14,7 +14,7 @@
 ```bash
 # 自托管 LiteLLM Proxy
 git clone https://github.com/BerriAI/litellm && cd litellm
-# 编辑 config.yaml，配置 model alias（与 lawGEO modelMap 对齐）：
+# 编辑 config.yaml，配置 model alias（与 BrandGEO modelMap 对齐）：
 #   model_list:
 #     - model_name: deepseek/deepseek-chat
 #       litellm_params: { model: deepseek/deepseek-chat, api_key: os.environ/DEEPSEEK_KEY }
@@ -23,7 +23,7 @@ docker run -p 4000:4000 -v $(pwd)/config.yaml:/app/config.yaml \
   ghcr.io/berriai/litellm:main-latest --config /app/config.yaml
 ```
 
-lawGEO 侧 `.env.local`：
+BrandGEO 侧 `.env.local`：
 ```
 LLM_GATEWAY_URL="http://localhost:4000/v1"
 LLM_GATEWAY_KEY="sk-your-litellm-master-key"

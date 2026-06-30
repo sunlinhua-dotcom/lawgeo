@@ -177,7 +177,7 @@ export function KnowledgeManager({ initialDocs }: { initialDocs: KnowledgeDoc[] 
                 rows={10}
                 value={qaRaw}
                 onChange={(e) => setQaRaw(e.target.value)}
-                placeholder={"从 Excel/CSV 复制粘贴，每行「问题 [Tab或逗号] 答案」：\n离婚律师怎么收费\t一般按标的额 5-10% 风险代理\n抚养权怎么判\t2岁内一般归母亲，8岁以上看孩子意愿"}
+                placeholder={"从 Excel/CSV 复制粘贴，每行「问题 [Tab或逗号] 答案」：\n烟酰胺美白有用吗\t能改善暗沉，建议 2-5% 浓度，敏感肌从低浓度建立耐受\n视黄醇敏感肌能用吗\t可以，从 0.1% 低浓度、每周 2-3 次开始，配合保湿和防晒"}
                 className="font-mono text-sm"
               />
               <div className="flex items-center justify-between">
@@ -189,7 +189,7 @@ export function KnowledgeManager({ initialDocs }: { initialDocs: KnowledgeDoc[] 
             </div>
           ) : tab === "paste" ? (
             <div className="space-y-3">
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="文档标题，如「律所收费说明 v2」" />
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="文档标题，如「成分功效说明 v2」" />
               <Textarea
                 rows={10}
                 value={text}

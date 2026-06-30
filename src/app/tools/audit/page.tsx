@@ -23,7 +23,7 @@ export default function AuditPage() {
             { name: "GEO 诊断", path: "/tools/audit" },
           ]),
           howToSchema({
-            name: "如何使用 lawGEO 免费 GEO 诊断工具",
+            name: "如何使用 BrandGEO 免费 GEO 诊断工具",
             description: "三步免费完成一次完整的 GEO 诊断",
             steps: [
               { name: "输入域名", text: "在工具中输入你的域名，例如 yourlawfirm.com" },

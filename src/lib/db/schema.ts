@@ -2,7 +2,6 @@ import { sql } from "drizzle-orm";
 import {
   index,
   integer,
-  primaryKey,
   real,
   sqliteTable,
   text,
@@ -32,10 +31,10 @@ export const projects = sqliteTable(
     name: text("name").notNull(),
     domain: text("domain").notNull(),
     industry: text("industry", {
-      enum: ["lawyer", "sme", "b2b", "local", "education", "other"],
+      enum: ["beauty", "fmcg", "consumer-electronics", "sme", "b2b", "local", "education", "lawyer", "other"],
     })
       .notNull()
-      .default("lawyer"),
+      .default("beauty"),
     region: text("region"),
     description: text("description"),
     createdAt: integer("created_at", { mode: "timestamp" })
@@ -58,7 +57,7 @@ export const keywords = sqliteTable(
       enum: ["informational", "commercial", "transactional", "navigational"],
     }).default("informational"),
     region: text("region"),
-    caseCategory: text("case_category"), // 案由（律所专属）
+    caseCategory: text("case_category"), // 品类 / 主题（如美妆品类；律所等行业也可复用为案由）
     priority: integer("priority").default(0),
     monthlyVolume: integer("monthly_volume"),
     competition: real("competition"),
@@ -301,7 +300,7 @@ export const authors = sqliteTable(
       .references(() => users.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     slug: text("slug").notNull(),
-    title: text("title"), // 头衔：高级律师 / 主笔专家 / 教研主任
+    title: text("title"), // 头衔：成分专家 / 主笔测评师 / 高级律师 等
     bio: text("bio"), // 简介
     expertise: text("expertise"), // JSON array：擅长领域
     avatarUrl: text("avatar_url"),
@@ -326,7 +325,7 @@ export const blogPosts = sqliteTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     authorId: text("author_id").references(() => authors.id, { onDelete: "set null" }),
-    industry: text("industry").notNull(), // lawyer/education/fmcg/...
+    industry: text("industry").notNull(), // beauty/fmcg/retail/lawyer/education/...
     slug: text("slug").notNull(),
     title: text("title").notNull(),
     excerpt: text("excerpt"),
@@ -493,10 +492,10 @@ export const audits = sqliteTable(
   ],
 );
 
-// ── 律所案由词库（内置静态数据，可同步至 DB） ─────────────────────────
+// ── 品类 / 主题词库（内置静态数据，可同步至 DB；美妆品类、律所案由等通用） ─────────────────────────
 export const caseCategories = sqliteTable("case_categories", {
   id: text("id").primaryKey(),
-  parent: text("parent"), // 民事/刑事/行政...
+  parent: text("parent"), // 一级分类：护肤/彩妆/个护…（律所行业则为民事/刑事/行政）
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   synonyms: text("synonyms"), // JSON array

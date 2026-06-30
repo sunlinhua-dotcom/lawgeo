@@ -25,7 +25,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   const body = (await req.json()) as Partial<{
     name: string;
     domain: string;
-    industry: "lawyer" | "sme" | "b2b" | "local" | "education" | "other";
+    industry: "beauty" | "fmcg" | "consumer-electronics" | "sme" | "b2b" | "local" | "education" | "lawyer" | "other";
     region: string;
     description: string;
   }>;

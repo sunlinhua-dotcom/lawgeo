@@ -6,7 +6,7 @@ import { getWallet, listLedgers } from "@/lib/tokens";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { TokenPanel } from "@/components/dashboard/token-panel";
 
 export const metadata = { title: "套餐 / Token", robots: { index: false } };
@@ -114,7 +114,7 @@ export default async function BillingPage() {
           ))}
         </div>
         <div className="mt-6 rounded-xl bg-indigo-50 p-4 text-sm text-indigo-900 dark:bg-indigo-950 dark:text-indigo-200">
-          💡 升级请联系销售：<Link href="/contact" className="font-semibold underline">hi@lawgeo.cn</Link>
+          💡 升级请联系销售：<Link href="/contact" className="font-semibold underline">hi@brandgeo.cn</Link>
           或微信 <span className="num">lawgeo-001</span>。年付享 8 折优惠。
         </div>
       </div>

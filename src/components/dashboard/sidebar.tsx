@@ -24,6 +24,7 @@ import {
   PenTool,
   Zap,
   Activity,
+  Network,
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,7 @@ const ICONS: Record<string, LucideIcon> = {
   PenTool,
   Zap,
   Activity,
+  Network,
 };
 
 export interface NavGroup {

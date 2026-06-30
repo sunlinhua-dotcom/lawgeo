@@ -4,8 +4,6 @@ import { and, eq, inArray } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { getDriver, SUPPORTED_PLATFORMS, type RemotePlatform } from "@/lib/publishers";
-import { adaptForPlatform } from "@/lib/publish";
-import type { PublishPlatform } from "@/lib/publish-specs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -59,7 +57,7 @@ export async function POST(req: Request) {
 
   // 对每个平台：先用 publish.ts 改写（标题/字数适配） — 海外平台用 markdown 直接发，无需中文平台改写
   // 这里直接用 draft.body 作为正文
-  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://lawgeo.cn"}/blog/draft-${draft.id}`;
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://brandgeo.cn"}/blog/draft-${draft.id}`;
 
   const results = await Promise.all(
     platforms.map(async (platform) => {

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { siteConfig } from "@/lib/site";
 import { Button } from "@/components/ui/button";
@@ -19,15 +19,9 @@ import {
 export function Nav({ user }: { user: { email: string } | null }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [isMac, setIsMac] = useState(false);
-
-  useEffect(() => {
-    if (typeof navigator !== "undefined") {
-      setIsMac(/Mac/.test(navigator.platform));
-    }
-  }, []);
 
   function openCommand() {
+    const isMac = typeof navigator !== "undefined" && /Mac/.test(navigator.platform);
     const event = new KeyboardEvent("keydown", {
       key: "k",
       metaKey: true,
@@ -43,8 +37,8 @@ export function Nav({ user }: { user: { email: string } | null }) {
           <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/20">
             <Scale className="h-4 w-4" />
           </div>
-          <span className="text-lg tracking-tight">lawGEO</span>
-          <span className="hidden text-xs text-slate-500 sm:inline-block">律所 GEO 平台</span>
+          <span className="text-lg tracking-tight">BrandGEO</span>
+          <span className="hidden text-xs text-slate-500 sm:inline-block">全行业 GEO 平台</span>
         </Link>
 
         <nav className="hidden items-center gap-0.5 lg:flex">

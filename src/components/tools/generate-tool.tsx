@@ -28,10 +28,10 @@ const FORMATS: Array<{ id: ContentFormat; label: string; desc: string }> = [
 ];
 
 const PRESETS = [
-  { label: "上海离婚律师收费", topic: "上海离婚律师怎么收费", region: "上海", caseType: "婚姻家庭" },
-  { label: "深圳劳动仲裁流程", topic: "深圳劳动仲裁找哪家律所", region: "深圳", caseType: "劳动仲裁" },
-  { label: "北京合同纠纷起诉", topic: "北京合同纠纷律师推荐", region: "北京", caseType: "合同纠纷" },
-  { label: "杭州知识产权咨询", topic: "杭州商标侵权律师", region: "杭州", caseType: "商标纠纷" },
+  { label: "烟酰胺美白精华", topic: "烟酰胺美白精华有用吗", region: "", caseType: "美白精华" },
+  { label: "敏感肌防晒推荐", topic: "敏感肌用什么防晒霜好", region: "", caseType: "防晒" },
+  { label: "玻尿酸精华用法", topic: "玻尿酸精华怎么用效果好", region: "", caseType: "保湿精华" },
+  { label: "视黄醇敏感肌", topic: "视黄醇敏感肌能用吗", region: "", caseType: "抗老精华" },
 ];
 
 export function GenerateTool() {
@@ -124,7 +124,7 @@ export function GenerateTool() {
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-600">话题 / 关键词 *</label>
               <Input
-                placeholder="如：上海离婚律师怎么收费"
+                placeholder="如：烟酰胺美白精华有用吗"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 disabled={loading}
@@ -132,18 +132,18 @@ export function GenerateTool() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600">地域（可选）</label>
+                <label className="mb-1 block text-xs font-medium text-slate-600">场景（可选）</label>
                 <Input
-                  placeholder="如：上海"
+                  placeholder="如：日常通勤 / 油皮"
                   value={region}
                   onChange={(e) => setRegion(e.target.value)}
                   disabled={loading}
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-600">案由（可选）</label>
+                <label className="mb-1 block text-xs font-medium text-slate-600">品类（可选）</label>
                 <Input
-                  placeholder="如：婚姻家庭"
+                  placeholder="如：美白精华"
                   value={caseType}
                   onChange={(e) => setCaseType(e.target.value)}
                   disabled={loading}
@@ -153,7 +153,7 @@ export function GenerateTool() {
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-600">背景素材（可选）</label>
               <Textarea
-                placeholder="贴入律所介绍、收费说明、典型案例等，模型会基于这些素材生成"
+                placeholder="贴入品牌介绍、成分说明、功效测评、用法建议等，模型会基于这些素材生成"
                 value={context}
                 onChange={(e) => setContext(e.target.value)}
                 rows={4}

@@ -22,7 +22,7 @@ export default function MonitorPage() {
       <PageHero
         badge="产品 · AI 引用监测"
         title={<>每天在 <span className="num">12</span> 个 AI 平台<br /><span className="gradient-text">跑你的关键词</span></>}
-        description="aceflow 等竞品仅覆盖 6 个国内平台，lawGEO 同时监测 8 个国内 + 4 个海外平台，给出完整 AI 引用份额视图。"
+        description="aceflow 等竞品仅覆盖 6 个国内平台，BrandGEO 同时监测 8 个国内 + 4 个海外平台，给出完整 AI 引用份额视图。"
       >
         <Button asChild size="lg" variant="primary">
           <Link href="/tools/compare">体验对比工具</Link>
@@ -47,7 +47,7 @@ export default function MonitorPage() {
         <div className="mt-16 grid gap-6 md:grid-cols-3">
           {[
             { icon: LineChart, title: "引用率趋势", desc: "每个关键词每日跑一次，趋势图直接看变化" },
-            { icon: TrendingUp, title: "Top3 推荐率", desc: "看你是否进入 AI 推荐律所/品牌的前三位" },
+            { icon: TrendingUp, title: "Top3 推荐率", desc: "看你是否进入 AI 推荐品牌的前三位" },
             { icon: BellRing, title: "邮件预警", desc: "引用率波动 / 竞品反超 / Top3 跌出立即邮件告警" },
           ].map((f) => {
             const Icon = f.icon;

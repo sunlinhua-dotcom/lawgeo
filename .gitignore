@@ -47,3 +47,9 @@ data/*.db*
 /data
 *.pdf
 !.env.example
+
+# MCP browser automation scratch
+.playwright-mcp/
+
+# Playwright test artifacts
+/test-results/

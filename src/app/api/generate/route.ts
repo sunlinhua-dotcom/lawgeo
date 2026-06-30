@@ -54,7 +54,9 @@ export async function POST(req: Request) {
     }
   }
 
-  let { system, user } = buildPrompt(body);
+  const promptParts = buildPrompt(body);
+  let { system } = promptParts;
+  const { user } = promptParts;
 
   // 自动注入知识库 (RAG)
   if (session && body.useKnowledge !== false) {

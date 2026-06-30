@@ -11,10 +11,10 @@ import { siteConfig } from "@/lib/site";
 import type { AiPlatformId } from "@/lib/ai";
 
 const PRESETS = [
-  { q: "上海离婚律师怎么选？", brand: "" },
-  { q: "推荐几家深圳的劳动仲裁律所", brand: "" },
-  { q: "北京合同纠纷应该找哪家律所", brand: "" },
-  { q: "什么是 GEO 生成式引擎优化？", brand: "lawGEO" },
+  { q: "敏感肌精华液哪个好用？", brand: "" },
+  { q: "推荐几款适合油皮的防晒霜", brand: "" },
+  { q: "烟酰胺美白精华怎么选", brand: "" },
+  { q: "什么是 GEO 生成式引擎优化？", brand: "BrandGEO" },
 ];
 
 interface ResultItem {
@@ -89,7 +89,7 @@ export function CompareTool() {
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-600">问题 *</label>
               <Input
-                placeholder="如：上海离婚律师怎么选？"
+                placeholder="如：敏感肌精华液哪个好用？"
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 disabled={loading}
@@ -98,7 +98,7 @@ export function CompareTool() {
             <div>
               <label className="mb-1 block text-xs font-medium text-slate-600">你的品牌名（用于追踪引用）</label>
               <Input
-                placeholder="如：某某律师事务所"
+                placeholder="如：悦肌护肤"
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
                 disabled={loading}

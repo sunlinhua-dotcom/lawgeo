@@ -1,12 +1,16 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Loader2, AtSign, KeyRound } from "lucide-react";
+import { AtSign, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function LoginForm() {
-  const router = useRouter();
+function safeNextPath(value: string) {
+  if (!value.startsWith("/") || value.startsWith("//") || value.startsWith("/login")) return "/dashboard";
+  return value;
+}
+
+export function LoginForm({ nextPath = "/dashboard" }: { nextPath?: string }) {
+  const redirectTo = safeNextPath(nextPath);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,8 +30,12 @@ export function LoginForm() {
         const j = await res.json().catch(() => ({}));
         throw new Error(j.error ?? "登录失败");
       }
-      router.push("/dashboard");
-      router.refresh();
+      const currentPath =
+        typeof window !== "undefined"
+          ? `${window.location.pathname}${window.location.search}${window.location.hash}`
+          : "";
+      const target = currentPath && !currentPath.startsWith("/login") ? safeNextPath(currentPath) : redirectTo;
+      window.location.assign(target);
     } catch (e: unknown) {
       setErr(e instanceof Error ? e.message : "登录失败");
     } finally {

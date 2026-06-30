@@ -30,7 +30,7 @@ export function quickSentiment(text: string, target: string): "positive" | "neut
 export async function extractKeywords(text: string): Promise<string[]> {
   try {
     const r = await ask({
-      system: "从下面这段 AI 回答里抽取 3-6 个最能代表「推荐理由/卖点」的关键词。只输出 JSON 数组，如 [\"经验丰富\",\"胜诉率高\"]，不要其他文字。",
+      system: "从下面这段 AI 回答里抽取 3-6 个最能代表「推荐理由/卖点」的关键词。只输出 JSON 数组，如 [\"成分温和\",\"敏感肌友好\"]，不要其他文字。",
       prompt: text.slice(0, 2000),
       temperature: 0.2,
     });

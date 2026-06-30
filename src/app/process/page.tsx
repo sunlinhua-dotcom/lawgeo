@@ -19,7 +19,7 @@ import { breadcrumbSchema, howToSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "服务流程 — 从需求确认到成效追踪",
-  description: "lawGEO 5 步标准化服务流程：需求确认 → 方案报价 → 合同签订 → 项目执行 → 成效追踪。每个节点的产出物与交付标准明确。",
+  description: "BrandGEO 5 步标准化服务流程：需求确认 → 方案报价 → 合同签订 → 项目执行 → 成效追踪。每个节点的产出物与交付标准明确。",
   alternates: { canonical: "/process" },
 };
 
@@ -59,7 +59,7 @@ const steps = [
     deliverables: [
       "正式服务合同（含 KPI 退款条款）",
       "数据访问与隐私协议",
-      "合规审查模板确认（律所 / 金融行业）",
+      "合规审查模板确认（化妆品 / 金融行业）",
       "增值税专用发票通道开通",
     ],
     duration: "1 周内",
@@ -71,7 +71,7 @@ const steps = [
     title: "项目执行",
     desc: "执行内容生产与发布，实时监测 AI 平台表现",
     deliverables: [
-      "案由 × 地域矩阵关键词部署",
+      "品类 × 场景矩阵关键词部署",
       "AI 内容批量生成与人审",
       "多平台分发（官网 + 7 渠道）",
       "知识库持续维护与更新",
@@ -104,7 +104,7 @@ export default function ProcessPage() {
         data={[
           breadcrumbSchema([{ name: "首页", path: "/" }, { name: "服务流程", path: "/process" }]),
           howToSchema({
-            name: "lawGEO 标准服务流程",
+            name: "BrandGEO 标准服务流程",
             description: "5 步从需求到成效的完整工作流",
             steps: steps.map((s) => ({ name: s.title, text: s.desc })),
           }),
@@ -123,7 +123,7 @@ export default function ProcessPage() {
           {/* 竖向连接线 */}
           <div className="absolute left-6 top-12 bottom-12 w-px bg-gradient-to-b from-indigo-200 via-fuchsia-200 to-amber-200 dark:from-indigo-900 dark:via-fuchsia-900 dark:to-amber-900 lg:left-8" />
 
-          {steps.map((s, i) => {
+          {steps.map((s) => {
             const Icon = s.icon;
             return (
               <div key={s.n} className="relative mb-12 flex gap-6 last:mb-0">

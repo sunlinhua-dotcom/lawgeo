@@ -27,9 +27,9 @@ interface Result {
 
 const PRESETS = [
   {
-    label: "律所案由",
+    label: "美妆品类",
     text:
-      "上海离婚律师推荐\n上海离婚律师收费\n离婚律师哪家好\n离婚冷静期是什么\n上海合同纠纷律师\n合同违约怎么起诉\n上海劳动仲裁找谁\n劳动仲裁多久出结果\n上海知识产权律师\n商标侵权怎么打官司",
+      "烟酰胺美白有用吗\n烟酰胺精华怎么用\n美白精华哪个好用\n玻尿酸精华怎么用\n保湿精华推荐\n敏感肌用什么防晒\n油皮防晒霜推荐\n视黄醇敏感肌能用吗\n油痘肌怎么护肤\n早C晚A顺序怎么搭",
   },
   {
     label: "教育培训",
@@ -39,7 +39,7 @@ const PRESETS = [
   {
     label: "B2B SaaS",
     text:
-      "GEO 工具推荐\nAI 搜索优化平台\n什么是 GEO\nGEO 多少钱\nGEO 见效周期\n品牌 AI 引用监测\n如何让品牌被 AI 推荐\nlawGEO vs aceflow",
+      "GEO 工具推荐\nAI 搜索优化平台\n什么是 GEO\nGEO 多少钱\nGEO 见效周期\n品牌 AI 引用监测\n如何让品牌被 AI 推荐\nBrandGEO vs aceflow",
   },
 ];
 
@@ -106,7 +106,7 @@ export function IntentTool() {
               <input
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
-                placeholder="如：法律服务 / 教育培训 / 金融"
+                placeholder="如：美妆个护 / 消费品 / 教育培训"
                 className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900"
               />
             </div>
@@ -116,7 +116,7 @@ export function IntentTool() {
                 rows={14}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="上海离婚律师推荐&#10;上海离婚律师收费&#10;离婚冷静期是什么&#10;..."
+                placeholder="烟酰胺美白有用吗&#10;美白精华哪个好用&#10;玻尿酸精华怎么用&#10;..."
                 className="font-mono text-sm"
               />
               <div className="mt-1 text-xs text-slate-500">

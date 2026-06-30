@@ -39,6 +39,9 @@ export interface AuditResult {
   geoSignals: {
     llmsTxt: boolean;
     llmsFullTxt: boolean;
+    markdownTwin: boolean;
+    aiIndex: boolean;
+    aiDiscovery: boolean;
     robotsTxt: boolean;
     sitemap: boolean;
     faqSchema: boolean;

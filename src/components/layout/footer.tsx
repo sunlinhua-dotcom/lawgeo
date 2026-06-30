@@ -12,10 +12,10 @@ export function Footer() {
               <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white">
                 <Scale className="h-4 w-4" />
               </div>
-              <span className="text-lg">lawGEO</span>
+              <span className="text-lg">BrandGEO</span>
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              面向律所与专业服务的 GEO 生成式引擎优化平台。让你的内容成为 AI 优先引用的权威信源。
+              面向美妆个护、消费品与各行业品牌的 GEO 生成式引擎优化平台。让你的内容成为 AI 优先引用的权威信源。
             </p>
             <div className="mt-6 space-y-1 text-sm text-slate-600 dark:text-slate-400">
               <div>邮箱：{siteConfig.contact.email}</div>

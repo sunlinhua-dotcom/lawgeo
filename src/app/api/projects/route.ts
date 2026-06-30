@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   const body = (await req.json()) as {
     name: string;
     domain: string;
-    industry?: "lawyer" | "sme" | "b2b" | "local" | "education" | "other";
+    industry?: "beauty" | "fmcg" | "consumer-electronics" | "sme" | "b2b" | "local" | "education" | "lawyer" | "other";
     region?: string;
     description?: string;
   };
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     userId: session.userId,
     name: body.name.trim(),
     domain: body.domain.trim().toLowerCase(),
-    industry: body.industry ?? "lawyer",
+    industry: body.industry ?? "beauty",
     region: body.region,
     description: body.description,
   });

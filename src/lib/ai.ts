@@ -16,7 +16,7 @@ const MIMO_BASE = process.env.MIMO_BASE_URL ?? "https://token-plan-cn.xiaomimimo
 export const MIMO_MODEL = process.env.MIMO_MODEL ?? "mimo-v2.5-pro";
 
 if (!MIMO_KEY && process.env.NODE_ENV !== "production") {
-  console.warn("[lawGEO] MIMO_API_KEY 未配置，AI 功能不可用");
+  console.warn("[BrandGEO] MIMO_API_KEY 未配置，AI 功能不可用");
 }
 
 export const mimo: OpenAIProvider = createOpenAI({

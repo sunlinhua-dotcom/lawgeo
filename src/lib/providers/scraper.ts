@@ -1,5 +1,5 @@
 import "server-only";
-import type { Scraper, ScrapeResult } from "./types";
+import type { Scraper } from "./types";
 
 /**
  * 网页抓取 provider。
@@ -78,7 +78,7 @@ const builtinScraper: Scraper = {
     const target = url.startsWith("http") ? url : `https://${url}`;
     try {
       const res = await fetch(target, {
-        headers: { "user-agent": "Mozilla/5.0 (compatible; lawGEO-bot/1.0)" },
+        headers: { "user-agent": "Mozilla/5.0 (compatible; BrandGEO-bot/1.0)" },
         signal: AbortSignal.timeout(opts?.timeoutMs ?? 20000),
         redirect: "follow",
       });

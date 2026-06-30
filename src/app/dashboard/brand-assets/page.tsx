@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, count } from "drizzle-orm";
+import { and, eq, gte, count } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { getCurrentBrand, getConversionProfile } from "@/lib/brand";
@@ -12,6 +12,10 @@ import { Sparkles, FileText, Target, Database } from "lucide-react";
 
 export const metadata = { title: "AI 品牌资产", robots: { index: false } };
 
+function daysAgo(days: number) {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+}
+
 export default async function BrandAssetsPage() {
   const session = await getSession();
   if (!session) redirect("/login");
@@ -19,7 +23,7 @@ export default async function BrandAssetsPage() {
   if (!brand) return <BrandGate moduleName="AI 品牌资产" />;
 
   const profile = await getConversionProfile(brand.id);
-  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const since = daysAgo(30);
 
   const [queries, intents, articles, docs] = await Promise.all([
     db.select().from(schema.aiQueries).where(and(eq(schema.aiQueries.userId, session.userId), gte(schema.aiQueries.queriedAt, since))).limit(2000),
@@ -30,7 +34,6 @@ export default async function BrandAssetsPage() {
 
   const total = queries.length;
   const mentioned = queries.filter((q) => q.cited).length;
-  const top1 = queries.filter((q) => q.rank === 1).length;
   const mentionRate = total ? Math.round((mentioned / total) * 100) : 0;
 
   // 热词资产：从被引用的查询里聚合关键词

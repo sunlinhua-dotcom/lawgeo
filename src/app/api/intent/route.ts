@@ -22,7 +22,7 @@ const SYSTEM = `你是 GEO 关键词意图定位专家。
       "ai_difficulty": "easy | medium | hard",
       "priority": 1-10,
       "recommended_format": "FAQ | HowTo | 对比表 | TL;DR | 长文 | 直接答案",
-      "competitive_landscape": "AI 推荐中常见的竞品类型（如：本地律所、连锁律所、自由律师）",
+      "competitive_landscape": "AI 推荐中常见的竞品类型（如：国际美妆大牌、新锐国货品牌、成分党测评号）",
       "key_facts_to_include": ["事实点 1", "事实点 2", "事实点 3"]
     }
   ],
@@ -37,8 +37,8 @@ const SYSTEM = `你是 GEO 关键词意图定位专家。
 \`\`\`
 
 聚类规则：
-- 同一簇内的关键词必须语义相关（如「上海离婚律师推荐」「上海离婚律师哪家好」属同簇）
-- 不同意图阶段应分簇（「什么是离婚冷静期」是 informational，「离婚律师推荐」是 transactional）
+- 同一簇内的关键词必须语义相关（如「敏感肌精华液哪个好用」「敏感肌精华推荐」属同簇）
+- 不同意图阶段应分簇（「烟酰胺美白有用吗」是 informational，「美白精华推荐」是 transactional）
 - 簇数控制在 3–8 个之间
 - 优先级综合考虑：搜索量、商业价值、AI 推荐难度、转化潜力
 

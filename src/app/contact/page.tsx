@@ -7,8 +7,8 @@ import { siteConfig } from "@/lib/site";
 import { ContactForm } from "@/components/forms/contact-form";
 
 export const metadata: Metadata = {
-  title: "联系 lawGEO — 预约 1v1 GEO 诊断",
-  description: `预约 60 分钟 1v1 GEO 诊断，免费获得律所 GEO 路线图。邮箱 ${siteConfig.contact.email} · 微信 ${siteConfig.contact.wechat}`,
+  title: "联系 BrandGEO — 预约 1v1 GEO 诊断",
+  description: `预约 60 分钟 1v1 GEO 诊断，免费获得全行业 GEO 路线图。邮箱 ${siteConfig.contact.email} · 微信 ${siteConfig.contact.wechat}`,
   alternates: { canonical: "/contact" },
 };
 
@@ -17,7 +17,7 @@ export default function ContactPage() {
     <>
       <JsonLd data={breadcrumbSchema([{ name: "首页", path: "/" }, { name: "联系", path: "/contact" }])} />
       <PageHero
-        badge="联系 lawGEO"
+        badge="联系 BrandGEO"
         title={<>预约一次 <span className="gradient-text">1v1 GEO 诊断</span></>}
         description="60 分钟在线沟通，给你一份可落地的 GEO 路线图。完全免费。"
       />

@@ -9,12 +9,12 @@ import { CASE_CATEGORIES } from "@/data/case-categories";
 import { REGIONS, aiVisibility, type Region } from "@/data/regions";
 
 const QUESTION_TEMPLATES = [
-  "{city}{case}律师怎么收费",
-  "{city}{case}律师推荐",
-  "{city}{case}找哪家律所",
-  "{city}{case}免费咨询",
-  "{city}{case}哪个律所好",
-  "{city}{case}怎么打官司",
+  "{city}{case}怎么挑选",
+  "{city}{case}推荐",
+  "{city}{case}哪个好用",
+  "{city}{case}怎么用",
+  "{city}{case}成分有用吗",
+  "{city}{case}适合什么肤质",
 ];
 
 type Row = {
@@ -31,23 +31,22 @@ type Row = {
 };
 
 function intentFor(tpl: string): Row["intent"] {
-  if (tpl.includes("收费") || tpl.includes("咨询") || tpl.includes("找哪家") || tpl.includes("推荐") || tpl.includes("哪个律所"))
+  if (tpl.includes("挑选") || tpl.includes("哪里买") || tpl.includes("哪个好用") || tpl.includes("推荐"))
     return "transactional";
-  if (tpl.includes("怎么打") || tpl.includes("怎么")) return "commercial";
+  if (tpl.includes("怎么用") || tpl.includes("怎么")) return "commercial";
   return "informational";
 }
 
 function volumeFor(region: Region, parent: string, tplIdx: number): number {
   const tierBase = { 1: 1800, 2: 900, 3: 350 }[region.tier as 1 | 2 | 3];
   const parentBoost: Record<string, number> = {
-    民事: 1.0,
-    刑事: 0.7,
-    "商事 / 公司": 0.8,
-    劳动: 0.9,
-    知识产权: 0.6,
-    "涉外 / 跨境": 0.4,
-    "互联网 / 新兴": 0.7,
-    行政: 0.5,
+    护肤: 1.0,
+    彩妆: 0.9,
+    "防晒 / 医美": 0.95,
+    美发: 0.85,
+    个护身体: 0.8,
+    香氛: 0.7,
+    法律服务: 0.5,
   };
   const boost = parentBoost[parent] ?? 0.7;
   const tplPenalty = [1.0, 0.9, 0.75, 0.6, 0.5, 0.4][tplIdx] ?? 0.4;
@@ -56,7 +55,7 @@ function volumeFor(region: Region, parent: string, tplIdx: number): number {
 }
 
 export function MatrixTool() {
-  const [selectedParents, setSelectedParents] = useState<string[]>(["民事", "劳动"]);
+  const [selectedParents, setSelectedParents] = useState<string[]>(["护肤", "彩妆"]);
   const [selectedTiers, setSelectedTiers] = useState<number[]>([1, 2]);
   const [selectedTemplates, setSelectedTemplates] = useState<number[]>([0, 1, 2]);
   const [keywordFilter, setKeywordFilter] = useState("");
@@ -104,7 +103,7 @@ export function MatrixTool() {
   }
 
   function exportCSV() {
-    const header = ["城市", "城市级别", "案由门类", "案由", "关键词", "意图", "预估月搜索量", "AI 提及度"];
+    const header = ["场景", "场景级别", "品类门类", "品类", "关键词", "意图", "预估月搜索量", "AI 提及度"];
     const csv = [
       header.join(","),
       ...rows.map((r) => [r.city, `T${r.cityTier}`, r.parent, r.caseName, r.keyword, r.intent, r.estVolume, r.aiMention].join(",")),
@@ -113,7 +112,7 @@ export function MatrixTool() {
   }
   function exportMarkdown() {
     const md = [
-      "| 城市 | 案由 | 关键词 | 意图 | 月搜索量 | AI 提及度 |",
+      "| 场景 | 品类 | 关键词 | 意图 | 月搜索量 | AI 提及度 |",
       "|---|---|---|---|---|---|",
       ...rows.map((r) => `| ${r.city} | ${r.caseName} | ${r.keyword} | ${r.intent} | ${r.estVolume} | ${r.aiMention} |`),
     ].join("\n");
@@ -124,7 +123,7 @@ export function MatrixTool() {
       "@context": "https://schema.org",
       "@type": "Question",
       name: r.keyword,
-      about: { "@type": "LegalService", name: `${r.city}${r.caseName}` },
+      about: { "@type": "Brand", name: `${r.city}${r.caseName}` },
     }));
     download("matrix-faq-schema.json", "application/json;charset=utf-8", JSON.stringify(blocks, null, 2));
   }
@@ -154,7 +153,7 @@ export function MatrixTool() {
           </CardHeader>
           <CardContent className="space-y-5">
             <div>
-              <div className="mb-2 text-xs font-medium text-slate-500">案由门类</div>
+              <div className="mb-2 text-xs font-medium text-slate-500">品类门类</div>
               <div className="flex flex-wrap gap-1.5">
                 {CASE_CATEGORIES.map((c) => (
                   <button
@@ -213,7 +212,7 @@ export function MatrixTool() {
               <div className="mb-2 text-xs font-medium text-slate-500">关键词搜索</div>
               <input
                 type="text"
-                placeholder="如：北京、离婚、商标…"
+                placeholder="如：美白、防晒、精华…"
                 value={keywordFilter}
                 onChange={(e) => setKeywordFilter(e.target.value)}
                 className="h-9 w-full rounded-md border border-slate-200 px-3 text-xs dark:border-slate-700 dark:bg-slate-900"
@@ -290,7 +289,7 @@ export function MatrixTool() {
               <tr>
                 <th className="px-4 py-3 text-left">关键词</th>
                 <th className="px-3 py-3 text-left">城市</th>
-                <th className="px-3 py-3 text-left">案由</th>
+                <th className="px-3 py-3 text-left">品类</th>
                 <th className="px-3 py-3 text-right">月搜索量</th>
                 <th className="px-3 py-3 text-right">AI 提及度</th>
                 <th className="px-3 py-3 text-left">意图</th>

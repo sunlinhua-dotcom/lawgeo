@@ -96,7 +96,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref,
   ) => {
-    const inputId = id ?? React.useId();
+    const generatedId = React.useId();
+    const inputId = id ?? generatedId;
     const computedState = error ? "error" : success ? "success" : state;
     const valueStr = typeof value === "string" ? value : value != null ? String(value) : "";
     const hasValue = valueStr.length > 0;
@@ -214,7 +215,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     },
     ref,
   ) => {
-    const inputId = id ?? React.useId();
+    const generatedId = React.useId();
+    const inputId = id ?? generatedId;
     const valueStr = typeof value === "string" ? value : value != null ? String(value) : "";
     const charCount = valueStr.length;
     const innerRef = React.useRef<HTMLTextAreaElement | null>(null);

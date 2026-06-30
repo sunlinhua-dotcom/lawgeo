@@ -1,6 +1,6 @@
-# lawGEO
+# BrandGEO
 
-> 律所 GEO 优化平台 — 让 AI 在回答法律问题时先推荐你
+> 全行业 GEO 优化平台 — 让 AI 在回答法律问题时先推荐你
 
 Next.js 16 + TypeScript + Tailwind v4 + Drizzle SQLite + Sonner + Framer Motion.
 
@@ -12,6 +12,10 @@ Next.js 16 + TypeScript + Tailwind v4 + Drizzle SQLite + Sonner + Framer Motion.
 - **控制台**（14 个子页）— 项目 / 诊断 / 生成 / 监测 / 关键词 / 知识库 / **行业博客批量发布** / 多平台发布 / 海外 API / 转化 / Agent / 报告 / 告警 / 计费
 - **第三方集成** — Dev.to / Hashnode / Medium 真实 API；Wechatsync 浏览器扩展同步 29+ 中文平台
 - **GEO 基建** — 完整 schema.org JSON-LD、llms.txt、sitemap.xml、robots.txt
+
+## 产品文档
+
+- [GEO 引用工程闭环 PRD](docs/geo-citation-engine-prd.md) — 下一阶段产品升级方案，按 GitHub 工程、官方文档、研究论文、数据研究和 Reddit 讨论建立来源编号与需求追溯。
 
 ## 本地开发
 

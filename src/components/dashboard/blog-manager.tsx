@@ -5,11 +5,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Loader2,
   Sparkles,
   Plus,
   User,
-  ExternalLink,
   Trash2,
   Eye,
   FileText,
@@ -18,7 +16,6 @@ import {
   CheckCircle2,
   Wand2,
   Hash,
-  Building2,
   Briefcase,
   Globe,
 } from "lucide-react";
@@ -394,7 +391,7 @@ function BulkWizard({
                             newAuthor: { ...(form.newAuthor ?? { name: "", title: "", bio: "" }), name: e.target.value },
                           })
                         }
-                        placeholder="如：张律师"
+                        placeholder="如：林研究员"
                         maxLength={20}
                         showCount
                       />
@@ -407,7 +404,7 @@ function BulkWizard({
                             newAuthor: { ...(form.newAuthor ?? { name: "", title: "", bio: "" }), title: e.target.value },
                           })
                         }
-                        placeholder="如：资深合伙人 / 法律专家"
+                        placeholder="如：成分研究员 / 护肤专家"
                         maxLength={30}
                         showCount
                       />
@@ -440,19 +437,18 @@ function BulkWizard({
                   required
                   hint={
                     <>
-                      每行一个，最多 100 个。建议长尾、问句形式（如：「上海离婚律师怎么收费」），转化更好。
+                      每行一个，最多 100 个。建议长尾、问句形式（如：「敏感肌精华液哪个好用」），转化更好。
                     </>
                   }
                   value={form.keywords}
                   onChange={(e) => setForm({ ...form, keywords: e.target.value })}
-                  placeholder={"上海离婚律师怎么收费\n上海离婚案件多久能结案\n离婚财产分割原则\n抚养权归属判定标准"}
+                  placeholder={"敏感肌精华液哪个好用\n烟酰胺美白有用吗\n视黄醇敏感肌能用吗\n油痘肌怎么护肤"}
                   rows={12}
                   showCount
                   className="font-mono"
                 />
                 <KeywordSuggestions
                   industry={form.industry}
-                  pillarSlug={form.pillarSlug}
                   onPick={(kw) =>
                     setForm((f) => ({
                       ...f,
@@ -656,15 +652,21 @@ function SelectableCard({
 
 function KeywordSuggestions({
   industry,
-  pillarSlug,
   onPick,
 }: {
   industry: string;
-  pillarSlug: string;
   onPick: (kw: string) => void;
 }) {
   // 简单本地建议词，不调用 API。生产可调真实关键词工具。
   const samples: Record<string, string[]> = {
+    beauty: [
+      "敏感肌精华液哪个好用",
+      "烟酰胺美白有用吗",
+      "视黄醇敏感肌能用吗",
+      "玻尿酸精华怎么用",
+      "油皮用什么防晒不闷痘",
+      "油痘肌怎么护肤",
+    ],
     lawyer: [
       "上海离婚律师怎么收费",
       "深圳劳动仲裁找哪家律所",

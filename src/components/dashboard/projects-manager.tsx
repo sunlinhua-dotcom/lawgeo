@@ -9,12 +9,15 @@ import { Input, Textarea } from "@/components/ui/input";
 import type { Project } from "@/lib/db/schema";
 
 const INDUSTRIES = [
-  { value: "lawyer", label: "律所 / 法律服务" },
+  { value: "beauty", label: "美妆个护 / 护肤彩妆" },
+  { value: "fmcg", label: "快消 / 食品饮料" },
+  { value: "consumer-electronics", label: "消费电子 / 3C" },
+  { value: "local", label: "本地生活 / 医美门店" },
+  { value: "other", label: "消费品 / 零售" },
   { value: "sme", label: "中小企业 / 专业服务" },
   { value: "b2b", label: "B2B / 制造业" },
-  { value: "local", label: "本地生活 / 医美 / 教育" },
   { value: "education", label: "教育培训" },
-  { value: "other", label: "其他" },
+  { value: "lawyer", label: "律所 / 法律服务" },
 ];
 
 export function ProjectsManager({ initialProjects }: { initialProjects: Project[] }) {
@@ -130,7 +133,7 @@ function ProjectForm({
   const [form, setForm] = useState({
     name: initial?.name ?? "",
     domain: initial?.domain ?? "",
-    industry: initial?.industry ?? "lawyer",
+    industry: initial?.industry ?? "beauty",
     region: initial?.region ?? "",
     description: initial?.description ?? "",
   });

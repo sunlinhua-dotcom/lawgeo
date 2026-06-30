@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Zap,
   Loader2,
@@ -93,7 +93,7 @@ export function RealtimeTool({
               required
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              placeholder="例如：成都离婚律师哪个好"
+              placeholder="例如：敏感肌精华液哪个好用"
               rows={2}
               hint="模拟真实用户会问 AI 的问题"
             />
@@ -102,7 +102,7 @@ export function RealtimeTool({
               required
               value={targetWord}
               onChange={(e) => setTargetWord(e.target.value)}
-              placeholder="例如：李航律师"
+              placeholder="例如：悦肌护肤"
               hint="检测 AI 答案里有没有提到它"
             />
             <div>

@@ -1,4 +1,4 @@
-import { desc, eq, sql, and, gte } from "drizzle-orm";
+import { desc, eq, and, gte } from "drizzle-orm";
 import Link from "next/link";
 import { db, schema } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,12 +15,16 @@ import { platformStatus, type AiPlatformId } from "@/lib/ai";
 
 export const metadata = { title: "AI 引用监测", robots: { index: false } };
 
+function daysAgo(days: number) {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+}
+
 export default async function MonitorDashboardPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
   // 最近 30 天的查询
-  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const since = daysAgo(30);
   const queries = await db
     .select()
     .from(schema.aiQueries)

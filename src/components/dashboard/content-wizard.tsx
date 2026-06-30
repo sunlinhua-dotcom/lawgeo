@@ -9,10 +9,10 @@ import {
   Radar,
   PolarRadiusAxis,
 } from "recharts";
-import { Sparkles, Loader2, Wand2, FileText, Copy, ArrowRight, Target, CheckCircle2 } from "lucide-react";
+import { Sparkles, Loader2, Wand2, FileText, Copy, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input, Textarea } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { StepFlow, StepPanel } from "@/components/ui/step-flow";
 import { EmptyState } from "@/components/ui/empty-state";

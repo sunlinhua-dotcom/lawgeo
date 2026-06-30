@@ -9,10 +9,13 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbSchema, legalServiceSchema, faqSchema } from "@/lib/seo";
 import { CASE_CATEGORIES } from "@/data/case-categories";
 
+// 本页是律所（附属行业）专属深度页：只取词库里的法律服务门类展示。
+const LEGAL_CATEGORIES = CASE_CATEGORIES.filter((c) => c.slug === "legal");
+
 export const metadata: Metadata = {
-  title: "律所 GEO 方案 — 案由词库 × 地域矩阵 × 12 平台监测",
+  title: "全行业 GEO 方案 — 案由词库 × 地域矩阵 × 12 平台监测",
   description:
-    "lawGEO 是国内首家面向律师事务所深度定制的 GEO 平台：内置 1,800+ 案由 × 300+ 城市关键词矩阵、合规审查模板、AI 引用监测，让你的律所成为 AI 推荐的第一选择。",
+    "BrandGEO 是国内首家面向律师事务所深度定制的 GEO 平台：内置 1,800+ 案由 × 300+ 城市关键词矩阵、合规审查模板、AI 引用监测，让你的律所成为 AI 推荐的第一选择。",
   alternates: { canonical: "/cases/lawyer" },
 };
 
@@ -23,10 +26,10 @@ const faqs = [
   },
   {
     q: "律所做 GEO 是否会涉及广告法风险？",
-    a: "lawGEO 内置了完整的律师广告合规审查模板，自动规避「最」「第一」「100% 胜诉」等广告法禁用词，所有生成内容默认通过合规审查。我们与多家头部律所内审合作过。",
+    a: "BrandGEO 内置了完整的律师广告合规审查模板，自动规避「最」「第一」「100% 胜诉」等广告法禁用词，所有生成内容默认通过合规审查。我们与多家头部律所内审合作过。",
   },
   {
-    q: "lawGEO 的案由词库覆盖哪些方向？",
+    q: "BrandGEO 的案由词库覆盖哪些方向？",
     a: "覆盖民事、刑事、行政、商事、劳动、知产、涉外共 7 大门类下 200+ 二级案由，与全国 300+ 地级市以上行政区做组合，预生成 1,800+ 高价值长尾关键词。",
   },
   {
@@ -41,7 +44,7 @@ const faqs = [
 
 const motivations = [
   { stat: "73%", label: "年轻当事人先问 AI 再决定是否联系律师" },
-  { stat: "12 个", label: "主流 AI 平台 lawGEO 全覆盖（aceflow 仅 6 个）" },
+  { stat: "12 个", label: "主流 AI 平台 BrandGEO 全覆盖（aceflow 仅 6 个）" },
   { stat: "1,800+", label: "内置案由 × 地域关键词，开箱即用" },
   { stat: "6 周", label: "客户平均首条来自 AI 推荐的咨询周期" },
 ];
@@ -62,10 +65,10 @@ export default function LawyerCasePage() {
           breadcrumbSchema([
             { name: "首页", path: "/" },
             { name: "行业方案", path: "/cases" },
-            { name: "律所 GEO 方案", path: "/cases/lawyer" },
+            { name: "全行业 GEO 方案", path: "/cases/lawyer" },
           ]),
           legalServiceSchema({
-            name: "lawGEO 律所生成式引擎优化方案",
+            name: "BrandGEO 律所生成式引擎优化方案",
             area: "中国大陆",
             description: "面向律师事务所的 GEO 全链路方案：案由词库、地域矩阵、AI 内容生成、12 平台引用监测、合规审查。",
           }),
@@ -76,7 +79,7 @@ export default function LawyerCasePage() {
       <PageHero
         badge="主打行业 · 律所深度定制"
         title={<>让 AI 在回答法律问题时<br /><span className="gradient-text">先推荐你</span></>}
-        description="lawGEO 是国内首家面向律师事务所深度定制的 GEO 平台。内置案由词库、地域矩阵、合规审查模板，开箱即用。"
+        description="BrandGEO 是国内首家面向律师事务所深度定制的 GEO 平台。内置案由词库、地域矩阵、合规审查模板，开箱即用。"
       >
         <Button asChild size="lg" variant="primary">
           <Link href="/tools/audit">免费跑一次律所诊断</Link>
@@ -132,7 +135,7 @@ export default function LawyerCasePage() {
           </div>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {CASE_CATEGORIES.map((c) => (
+            {LEGAL_CATEGORIES.map((c) => (
               <Card key={c.parent} className="lift">
                 <CardHeader>
                   <BookOpen className="h-5 w-5 text-indigo-600" />
@@ -286,7 +289,7 @@ export default function LawyerCasePage() {
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600" />
         <div className="relative mx-auto max-w-4xl px-4 py-20 text-center text-white lg:px-8">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            预约一次律所 GEO 1v1 诊断
+            预约一次全行业 GEO 1v1 诊断
           </h2>
           <p className="mt-4 text-lg text-indigo-100">免费 60 分钟，给你一份可落地的 GEO 路线图。</p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
